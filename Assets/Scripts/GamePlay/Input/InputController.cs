@@ -20,6 +20,8 @@ namespace GamePlay.Input
             _inputSystem.Player.SetCallbacks(this);
             _inputSystem.Player.Enable();
             _handler = _playerController;
+            Cursor.lockState = CursorLockMode.Locked;
+            Cursor.visible = false;
         }
 
         public void OnMove(InputAction.CallbackContext context)

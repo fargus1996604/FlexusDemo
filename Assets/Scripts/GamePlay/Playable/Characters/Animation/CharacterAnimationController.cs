@@ -35,16 +35,9 @@ namespace GamePlay.Playable.Characters.Animation
 
             if (direction != Vector2.zero)
             {
-                float angle = 0;
-                if (direction.y < 0)
-                {
-                    angle = direction.x < 0 ? -180 : 180;
-                }
-
-                _anlge = angle;
                 var lookDirection = direction.y >= 0
                     ? Quaternion.identity
-                    : Quaternion.AngleAxis(angle, Vector3.up);
+                    : Quaternion.AngleAxis(180, Vector3.up);
 
                 lookDirection = Quaternion.LookRotation(cameraForward) * lookDirection;
                 lookDirection.x = 0;
