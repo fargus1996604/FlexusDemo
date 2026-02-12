@@ -12,10 +12,8 @@ namespace GamePlay.Playable.Characters.Animation
         private float _movingInterpolation = 1f;
 
         [SerializeField]
-        private Vector4 _originalRotation;
+        private Transform _bodyOrientationPivot;
 
-        [SerializeField]
-        private float _anlge;
 
         private Vector3 _deltaPosition;
         public Vector3 DeltaPosition => _deltaPosition;
@@ -23,6 +21,7 @@ namespace GamePlay.Playable.Characters.Animation
         private readonly int MOVE_X_FLOAT_KEY = Animator.StringToHash("MoveX");
         private readonly int MOVE_Y_FLOAT_KEY = Animator.StringToHash("MoveY");
         private readonly int DASH_BOOLEAN_KEY = Animator.StringToHash("Dash");
+        private readonly int FORWARD_LOKOING_FLOAT_KEY = Animator.StringToHash("ForwardLooking");
 
 
         private Vector2 _moveDirection = Vector2.zero;
@@ -35,20 +34,17 @@ namespace GamePlay.Playable.Characters.Animation
 
             if (direction != Vector2.zero)
             {
-                var lookDirection = direction.y >= 0
-                    ? Quaternion.identity
-                    : Quaternion.AngleAxis(180, Vector3.up);
-
-                lookDirection = Quaternion.LookRotation(cameraForward) * lookDirection;
-                lookDirection.x = 0;
-                lookDirection.z = 0;
-
-                transform.localRotation = Quaternion.LerpUnclamped(transform.localRotation, lookDirection,
+                var lookRotation = Quaternion.LookRotation(cameraForward);
+                lookRotation.x = 0;
+                lookRotation.z = 0;
+                transform.localRotation = Quaternion.LerpUnclamped(transform.localRotation, lookRotation,
                     _movingInterpolation * Time.deltaTime);
-            }
 
-            _originalRotation = new Vector4(transform.localRotation.x, transform.localRotation.y,
-                transform.localRotation.z, transform.localRotation.z);
+                if (Mathf.Abs(_moveDirection.y) > 0.9f)
+                {
+                    CharacterAnimator.SetFloat(FORWARD_LOKOING_FLOAT_KEY,GetForwardLooking(cameraForward));
+                }
+            }
         }
 
         public void SetDash(bool dash)
@@ -59,6 +55,11 @@ namespace GamePlay.Playable.Characters.Animation
         private void OnAnimatorMove()
         {
             _deltaPosition = CharacterAnimator.deltaPosition;
+        }
+
+        private float GetForwardLooking(Vector3 cameraForward)
+        {
+            return Vector3.Dot(_bodyOrientationPivot.forward, cameraForward) > 0 ? 0f : 1f;
         }
     }
 }
