@@ -1,4 +1,6 @@
+using System;
 using UnityEngine;
+using UnityEngine.Events;
 
 namespace GamePlay.Playable.Characters.Animation
 {
@@ -8,6 +10,8 @@ namespace GamePlay.Playable.Characters.Animation
         private Animator _characterAnimator;
         protected Animator CharacterAnimator => _characterAnimator ??= GetComponent<Animator>();
 
+        public UnityEvent OnFootStep;
+        
         [SerializeField]
         private float _movingInterpolation = 1f;
         public float MovingInterpolation => _movingInterpolation;
@@ -26,9 +30,12 @@ namespace GamePlay.Playable.Characters.Animation
         private readonly string BASE_LAYER_NAME = "Base Layer";
         private readonly string DRIVING_LAYER_NAME = "Driving Layer";
         private readonly string SEAT_LAYER_NAME = "Seat Layer";
+        private readonly string MINIGUN_LAYER_NAME = "MiniGun Layer";
         
 
         private Vector2 _moveDirection = Vector2.zero;
+        private Transform _leftHandIkTarget;
+        private Transform _rightHandIkTarget;
 
         public void Move(Vector2 direction, Vector3 cameraForward)
         {
@@ -44,12 +51,18 @@ namespace GamePlay.Playable.Characters.Animation
                 }
             }
         }
-
+        
+        public void SetDash(bool dash)
+        {
+            CharacterAnimator.SetBool(DASH_BOOLEAN_KEY, dash);
+        }
+        
         public void SwitchToBaseLayer()
         {
             CharacterAnimator.SetLayerWeight(CharacterAnimator.GetLayerIndex(BASE_LAYER_NAME), 1);
             CharacterAnimator.SetLayerWeight(CharacterAnimator.GetLayerIndex(DRIVING_LAYER_NAME), 0);
             CharacterAnimator.SetLayerWeight(CharacterAnimator.GetLayerIndex(SEAT_LAYER_NAME), 0);
+            CharacterAnimator.SetLayerWeight(CharacterAnimator.GetLayerIndex(MINIGUN_LAYER_NAME), 0);
         }
 
         public void SwitchToDrivingLayer()
@@ -57,6 +70,7 @@ namespace GamePlay.Playable.Characters.Animation
             CharacterAnimator.SetLayerWeight(CharacterAnimator.GetLayerIndex(BASE_LAYER_NAME), 0);
             CharacterAnimator.SetLayerWeight(CharacterAnimator.GetLayerIndex(DRIVING_LAYER_NAME), 1);
             CharacterAnimator.SetLayerWeight(CharacterAnimator.GetLayerIndex(SEAT_LAYER_NAME), 0);
+            CharacterAnimator.SetLayerWeight(CharacterAnimator.GetLayerIndex(MINIGUN_LAYER_NAME), 0);
         }
         
         public void SwitchToSeatLayer()
@@ -64,21 +78,64 @@ namespace GamePlay.Playable.Characters.Animation
             CharacterAnimator.SetLayerWeight(CharacterAnimator.GetLayerIndex(BASE_LAYER_NAME), 0);
             CharacterAnimator.SetLayerWeight(CharacterAnimator.GetLayerIndex(DRIVING_LAYER_NAME), 0);
             CharacterAnimator.SetLayerWeight(CharacterAnimator.GetLayerIndex(SEAT_LAYER_NAME), 1);
+            CharacterAnimator.SetLayerWeight(CharacterAnimator.GetLayerIndex(MINIGUN_LAYER_NAME), 0);
+        }
+        
+        public void SwitchToMiniGunLayer()
+        {
+            CharacterAnimator.SetLayerWeight(CharacterAnimator.GetLayerIndex(BASE_LAYER_NAME), 0);
+            CharacterAnimator.SetLayerWeight(CharacterAnimator.GetLayerIndex(DRIVING_LAYER_NAME), 0);
+            CharacterAnimator.SetLayerWeight(CharacterAnimator.GetLayerIndex(SEAT_LAYER_NAME), 0);
+            CharacterAnimator.SetLayerWeight(CharacterAnimator.GetLayerIndex(MINIGUN_LAYER_NAME), 1);
         }
         
         public void ResetBodyOrientation()
         {
             transform.localRotation = Quaternion.identity;
         }
-        
-        public void SetDash(bool dash)
+
+        public void SetLeftHandIKTarget(Transform leftHandIKTarget)
         {
-            CharacterAnimator.SetBool(DASH_BOOLEAN_KEY, dash);
+            _leftHandIkTarget = leftHandIKTarget;
         }
 
+        public void SetRightHandIKTarget(Transform rightHandIKTarget)
+        {
+            _rightHandIkTarget = rightHandIKTarget;
+        }
+
+        public void ResetAllIkTargets()
+        {
+            _leftHandIkTarget = null;
+            _rightHandIkTarget = null;
+            
+            CharacterAnimator.SetIKPositionWeight(AvatarIKGoal.LeftHand, 0);
+            CharacterAnimator.SetIKPositionWeight(AvatarIKGoal.RightHand, 0);
+        }
+
+        public void CallFootStepEvent()
+        {
+            OnFootStep?.Invoke();
+        }
+        
         private void OnAnimatorMove()
         {
             _deltaPosition = CharacterAnimator.deltaPosition;
+        }
+
+        private void OnAnimatorIK(int layerIndex)
+        {
+            if (_leftHandIkTarget != null)
+            {
+                CharacterAnimator.SetIKPositionWeight(AvatarIKGoal.LeftHand, 1);
+                CharacterAnimator.SetIKPosition(AvatarIKGoal.LeftHand, _leftHandIkTarget.position);
+            }
+
+            if (_rightHandIkTarget != null)
+            {
+                CharacterAnimator.SetIKPositionWeight(AvatarIKGoal.RightHand, 1);
+                CharacterAnimator.SetIKPosition(AvatarIKGoal.RightHand, _rightHandIkTarget.position);
+            }
         }
 
         private float GetForwardLooking(Vector3 cameraForward)

@@ -2,7 +2,6 @@ using Gameplay.Core.StateMachine;
 using Gameplay.Core.StateMachine.Interfaces;
 using GamePlay.Vehicle.Car;
 using GamePlay.Vehicle.Car.Seats;
-using UnityEngine;
 
 namespace GamePlay.Playable.Characters.State
 {
@@ -30,6 +29,18 @@ namespace GamePlay.Playable.Characters.State
                 Context
                     .SwitchStateWithData<CharacterDrivingVehicleParamState,
                         CharacterDrivingVehicleParamState.VehicleData>(data);
+            }
+            else if (Data.Seat is MiniGunSeat miniGunSeat)
+            {
+                var data = new CharacterSeatMiniGunParamState.OutData()
+                {
+                    Vehicle = Data.Vehicle,
+                    MiniGunSeat = miniGunSeat,
+                    MiniGunController = miniGunSeat.Controller
+                };
+                Context
+                    .SwitchStateWithData<CharacterSeatMiniGunParamState,
+                        CharacterSeatMiniGunParamState.OutData>(data);
             }
             else
             {

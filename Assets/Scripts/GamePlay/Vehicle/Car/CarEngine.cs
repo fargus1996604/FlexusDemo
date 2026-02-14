@@ -1,8 +1,4 @@
-using System;
-using GamePlay.Input;
 using UnityEngine;
-using UnityEngine.InputSystem;
-using UnityEngine.Serialization;
 using Random = UnityEngine.Random;
 
 namespace GamePlay.Vehicle.Car
@@ -12,7 +8,6 @@ namespace GamePlay.Vehicle.Car
     {
         private Rigidbody _vehicleRigidbody;
         protected Rigidbody VehicleRigidbody => _vehicleRigidbody ??= GetComponent<Rigidbody>();
-        
         
         [SerializeField]
         private Transform _centerOfMass;

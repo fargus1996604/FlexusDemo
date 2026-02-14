@@ -1,8 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using GamePlay.Input;
-using GamePlay.Playable;
 using GamePlay.Playable.Characters;
 using GamePlay.Vehicle.Car.Seats;
 using UnityEngine;
@@ -61,7 +59,7 @@ namespace GamePlay.Vehicle.Car
             if (currentSeat == null)
                 return null;
 
-            var nextSeat = GetFreeSeat();
+            var nextSeat = GetNextFreeSeat(currentSeat);
             if (nextSeat == null)
                 return null;
 
@@ -83,6 +81,22 @@ namespace GamePlay.Vehicle.Car
             }
         }
 
+        private Seat GetNextFreeSeat(Seat currentSeat)
+        {
+            int total = _seats.Count;
+            int startIdx = _seats.IndexOf(currentSeat) + 1;
+
+            for (int i = 0; i < total; i++)
+            {
+                int nextIdx = (startIdx + i) % total;
+                if (_seats[nextIdx].HasFree)
+                {
+                    return _seats[nextIdx];
+                }
+            }
+            return null;
+        }
+        
         private Seat GetFreeSeat()
         {
             foreach (var seat in _seats)
