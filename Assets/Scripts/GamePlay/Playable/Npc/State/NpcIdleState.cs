@@ -1,30 +1,30 @@
 using Gameplay.Core.StateMachine;
 using Gameplay.Core.StateMachine.Interfaces;
 using GamePlay.Input;
+using GamePlay.Playable.Characters;
 using GamePlay.Playable.Characters.Animation;
+using GamePlay.Playable.Characters.State;
 using GamePlay.Vehicle.Car;
 using UnityEngine;
 
-namespace GamePlay.Playable.Characters.State
+namespace GamePlay.Playable.Npc.State
 {
-    public class CharacterExploringState : TickableBaseState
+    public class NpcIdleState : TickableBaseState
     {
         private BaseCharacterController.PlayerData _data;
+        private CharacterAI.InteractionData _interactionData;
         private CharacterController _characterController;
         private CharacterAnimationController _characterAnimationController;
-        private PlayerInputHandler _inputHandler;
-        private Camera _camera;
 
-        public CharacterExploringState(IStateContext context, BaseCharacterController.PlayerData data,
-            CharacterController characterController, CharacterAnimationController characterAnimationController,
-            PlayerInputHandler inputHandler,
-            Camera camera) : base(context)
+        public NpcIdleState(IStateContext context, BaseCharacterController.PlayerData data,
+            CharacterAI.InteractionData interactionData,
+            CharacterController characterController,
+            CharacterAnimationController characterAnimationController) : base(context)
         {
             _data = data;
+            _interactionData = interactionData;
             _characterController = characterController;
             _characterAnimationController = characterAnimationController;
-            _inputHandler = inputHandler;
-            _camera = camera;
         }
 
         public override void Tick(float deltaTime)
@@ -36,36 +36,22 @@ namespace GamePlay.Playable.Characters.State
 
             _data.Velocity.y += _data.Gravity * Time.deltaTime;
             _characterController.Move(_characterAnimationController.DeltaPosition + (_data.Velocity * deltaTime));
-
-            var cameraLook = _camera.transform.forward;
-
-            if (_inputHandler.Move != Vector2.zero)
-            {
-                var lookRotation = Quaternion.LookRotation(cameraLook);
-                lookRotation.x = 0;
-                lookRotation.z = 0;
-                _characterController.transform.rotation = Quaternion.LerpUnclamped(_characterController.transform.rotation, lookRotation,
-                    _characterAnimationController.MovingInterpolation * Time.deltaTime);
-            }
-            
-            _characterAnimationController.Move(_inputHandler.Move, cameraLook);
-            _characterAnimationController.SetDash(_inputHandler.IsSprinting);
+            _characterAnimationController.Move(_interactionData.MoveDirection, _characterController.transform.forward);
+            _characterAnimationController.SetDash(_interactionData.IsSprinting);
         }
 
         public override void Enter()
         {
             _characterController.enabled = true;
             _characterAnimationController.SwitchToBaseLayer();
-            _inputHandler.InteractPressed.AddListener(FindClosestVehicles);
-            _inputHandler.Enable();
+            _interactionData.InteractPressed.AddListener(FindClosestVehicles);
         }
 
         public override void Exit()
         {
-            _inputHandler.InteractPressed.RemoveListener(FindClosestVehicles);
-            _inputHandler.Disable();
+            _interactionData.InteractPressed.RemoveListener(FindClosestVehicles);
         }
-        
+
         private void FindClosestVehicles()
         {
             var colliders =

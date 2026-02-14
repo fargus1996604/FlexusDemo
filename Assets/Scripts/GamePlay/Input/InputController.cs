@@ -1,5 +1,6 @@
 using System;
 using GamePlay.Playable;
+using GamePlay.Playable.Characters;
 using GamePlay.Vehicle.Car;
 using UnityEngine;
 using UnityEngine.Events;
@@ -10,7 +11,7 @@ namespace GamePlay.Input
     public class InputController : MonoBehaviour
     {
         [SerializeField]
-        private PlayerController _playerController;
+        private BaseCharacterController _playerController;
 
         private UserInputSystem _inputSystem;
 
@@ -52,16 +53,20 @@ namespace GamePlay.Input
         {
             _inputSystem = userInputSystem;
             _inputSystem.Player.SetCallbacks(this);
+            _inputSystem.Player.Interact.performed += delegate
+            {
+                InteractPressed?.Invoke();
+            };
         }
 
         public void Enable()
         {
-            _inputSystem.Enable();
+            _inputSystem.Player.Enable();
         }
 
         public void Disable()
         {
-            _inputSystem.Disable();
+            _inputSystem.Player.Disable();
         }
 
         public void OnMove(InputAction.CallbackContext context)
@@ -75,10 +80,6 @@ namespace GamePlay.Input
 
         public void OnInteract(InputAction.CallbackContext context)
         {
-            if (context.ReadValueAsButton())
-            {
-                InteractPressed?.Invoke();
-            }
         }
 
         public void OnSprint(InputAction.CallbackContext context)
@@ -90,28 +91,37 @@ namespace GamePlay.Input
     public class VehicleInputHandler : IInputHandler, UserInputSystem.IVehicleActions
     {
         public UnityEvent InteractPressed = new UnityEvent();
-
+        public UnityEvent ChangeSeatPressed = new UnityEvent();
 
         private CarVehicleInputData _carVehicleInputData;
         public CarVehicleInputData CarVehicleInputData => _carVehicleInputData;
 
         private UserInputSystem _inputSystem;
+        public UserInputSystem InputSystem => _inputSystem;
 
         public VehicleInputHandler(UserInputSystem userInputSystem)
         {
             _inputSystem = userInputSystem;
             _inputSystem.Vehicle.SetCallbacks(this);
+            _inputSystem.Vehicle.Interact.performed += delegate
+            {
+                InteractPressed?.Invoke();
+            };
+            _inputSystem.Vehicle.ChangeSeat.performed += delegate
+            {
+                ChangeSeatPressed?.Invoke();
+            };
             _carVehicleInputData = new CarVehicleInputData();
         }
 
         public void Enable()
         {
-            _inputSystem.Enable();
+            _inputSystem.Vehicle.Enable();
         }
 
         public void Disable()
         {
-            _inputSystem.Disable();
+            _inputSystem.Vehicle.Disable();
         }
 
         public void OnMove(InputAction.CallbackContext context)
@@ -127,15 +137,15 @@ namespace GamePlay.Input
 
         public void OnInteract(InputAction.CallbackContext context)
         {
-            if (context.ReadValueAsButton())
-            {
-                InteractPressed?.Invoke();
-            }
         }
 
         public void OnBrake(InputAction.CallbackContext context)
         {
             _carVehicleInputData.IsBraking = context.ReadValueAsButton();
+        }
+
+        public void OnChangeSeat(InputAction.CallbackContext context)
+        {
         }
     }
 }

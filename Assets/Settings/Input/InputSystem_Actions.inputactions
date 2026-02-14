@@ -30,7 +30,7 @@
                     "id": "852140f2-7766-474d-8707-702459ba45f3",
                     "expectedControlType": "",
                     "processors": "",
-                    "interactions": "Hold",
+                    "interactions": "",
                     "initialStateCheck": false
                 },
                 {
@@ -250,13 +250,22 @@
                     "id": "6a5779e5-95cb-48fb-8654-70b4c029994a",
                     "expectedControlType": "",
                     "processors": "",
-                    "interactions": "Hold",
+                    "interactions": "",
                     "initialStateCheck": false
                 },
                 {
                     "name": "Brake",
                     "type": "Button",
                     "id": "d19beaf8-5240-4cce-a742-4d7e00e1aad3",
+                    "expectedControlType": "",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                },
+                {
+                    "name": "ChangeSeat",
+                    "type": "Button",
+                    "id": "68e74e94-b5fb-4517-b30b-47aeb387aaf0",
                     "expectedControlType": "",
                     "processors": "",
                     "interactions": "",
@@ -437,6 +446,17 @@
                     "processors": "",
                     "groups": "Gamepad",
                     "action": "Interact",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "ba3ce46d-5645-435e-add7-6108327c5338",
+                    "path": "<Keyboard>/g",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "ChangeSeat",
                     "isComposite": false,
                     "isPartOfComposite": false
                 }

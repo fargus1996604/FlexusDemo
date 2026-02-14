@@ -118,7 +118,7 @@ namespace GamePlay.Input
                     ""id"": ""852140f2-7766-474d-8707-702459ba45f3"",
                     ""expectedControlType"": """",
                     ""processors"": """",
-                    ""interactions"": ""Hold"",
+                    ""interactions"": """",
                     ""initialStateCheck"": false
                 },
                 {
@@ -338,13 +338,22 @@ namespace GamePlay.Input
                     ""id"": ""6a5779e5-95cb-48fb-8654-70b4c029994a"",
                     ""expectedControlType"": """",
                     ""processors"": """",
-                    ""interactions"": ""Hold"",
+                    ""interactions"": """",
                     ""initialStateCheck"": false
                 },
                 {
                     ""name"": ""Brake"",
                     ""type"": ""Button"",
                     ""id"": ""d19beaf8-5240-4cce-a742-4d7e00e1aad3"",
+                    ""expectedControlType"": """",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""ChangeSeat"",
+                    ""type"": ""Button"",
+                    ""id"": ""68e74e94-b5fb-4517-b30b-47aeb387aaf0"",
                     ""expectedControlType"": """",
                     ""processors"": """",
                     ""interactions"": """",
@@ -525,6 +534,17 @@ namespace GamePlay.Input
                     ""processors"": """",
                     ""groups"": ""Gamepad"",
                     ""action"": ""Interact"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""ba3ce46d-5645-435e-add7-6108327c5338"",
+                    ""path"": ""<Keyboard>/g"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""ChangeSeat"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
                 }
@@ -1122,6 +1142,7 @@ namespace GamePlay.Input
             m_Vehicle_Look = m_Vehicle.FindAction("Look", throwIfNotFound: true);
             m_Vehicle_Interact = m_Vehicle.FindAction("Interact", throwIfNotFound: true);
             m_Vehicle_Brake = m_Vehicle.FindAction("Brake", throwIfNotFound: true);
+            m_Vehicle_ChangeSeat = m_Vehicle.FindAction("ChangeSeat", throwIfNotFound: true);
             // UI
             m_UI = asset.FindActionMap("UI", throwIfNotFound: true);
             m_UI_Navigate = m_UI.FindAction("Navigate", throwIfNotFound: true);
@@ -1349,6 +1370,7 @@ namespace GamePlay.Input
         private readonly InputAction m_Vehicle_Look;
         private readonly InputAction m_Vehicle_Interact;
         private readonly InputAction m_Vehicle_Brake;
+        private readonly InputAction m_Vehicle_ChangeSeat;
         /// <summary>
         /// Provides access to input actions defined in input action map "Vehicle".
         /// </summary>
@@ -1376,6 +1398,10 @@ namespace GamePlay.Input
             /// Provides access to the underlying input action "Vehicle/Brake".
             /// </summary>
             public InputAction @Brake => m_Wrapper.m_Vehicle_Brake;
+            /// <summary>
+            /// Provides access to the underlying input action "Vehicle/ChangeSeat".
+            /// </summary>
+            public InputAction @ChangeSeat => m_Wrapper.m_Vehicle_ChangeSeat;
             /// <summary>
             /// Provides access to the underlying input action map instance.
             /// </summary>
@@ -1414,6 +1440,9 @@ namespace GamePlay.Input
                 @Brake.started += instance.OnBrake;
                 @Brake.performed += instance.OnBrake;
                 @Brake.canceled += instance.OnBrake;
+                @ChangeSeat.started += instance.OnChangeSeat;
+                @ChangeSeat.performed += instance.OnChangeSeat;
+                @ChangeSeat.canceled += instance.OnChangeSeat;
             }
 
             /// <summary>
@@ -1437,6 +1466,9 @@ namespace GamePlay.Input
                 @Brake.started -= instance.OnBrake;
                 @Brake.performed -= instance.OnBrake;
                 @Brake.canceled -= instance.OnBrake;
+                @ChangeSeat.started -= instance.OnChangeSeat;
+                @ChangeSeat.performed -= instance.OnChangeSeat;
+                @ChangeSeat.canceled -= instance.OnChangeSeat;
             }
 
             /// <summary>
@@ -1801,6 +1833,13 @@ namespace GamePlay.Input
             /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
             /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
             void OnBrake(InputAction.CallbackContext context);
+            /// <summary>
+            /// Method invoked when associated input action "ChangeSeat" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
+            /// </summary>
+            /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
+            /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
+            /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
+            void OnChangeSeat(InputAction.CallbackContext context);
         }
         /// <summary>
         /// Interface to implement callback methods for all input action callbacks associated with input actions defined by "UI" which allows adding and removing callbacks.

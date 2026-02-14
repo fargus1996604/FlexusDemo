@@ -204,6 +204,54 @@ WheelCollider:
   m_LayerOverridePriority: 0
   m_Enabled: 1
   m_ProvidesContacts: 0
+--- !u!1 &3875435687930369841
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 8836623386319129792}
+  - component: {fileID: 3803506554278187832}
+  m_Layer: 0
+  m_Name: PasagerSeat
+  m_TagString: Untagged
+  m_Icon: {fileID: -964228994112308473, guid: 0000000000000000d000000000000000, type: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &8836623386319129792
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3875435687930369841}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0.285, y: 0.443, z: -0.043}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1062299140565528563}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &3803506554278187832
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3875435687930369841}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 286e5ee5cf493444cab00df8c5336916, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _pivot: {fileID: 8836623386319129792}
+  _doorPlayerPivot: {fileID: 6304661960614946910}
+  _player: {fileID: 0}
+  _test: 0
 --- !u!1 &5352465567322735503
 GameObject:
   m_ObjectHideFlags: 0
@@ -215,7 +263,7 @@ GameObject:
   - component: {fileID: 3398102290312997121}
   - component: {fileID: 38007765146249272}
   m_Layer: 0
-  m_Name: Seat
+  m_Name: DriverSeat
   m_TagString: Untagged
   m_Icon: {fileID: -964228994112308473, guid: 0000000000000000d000000000000000, type: 0}
   m_NavMeshLayer: 0
@@ -251,6 +299,7 @@ MonoBehaviour:
   _pivot: {fileID: 3398102290312997121}
   _doorPlayerPivot: {fileID: 3263861085083833252}
   _player: {fileID: 0}
+  _test: 0
 --- !u!1 &5744811688119348084
 GameObject:
   m_ObjectHideFlags: 0
@@ -291,6 +340,7 @@ Transform:
   - {fileID: 819402329700386121}
   - {fileID: 6461355984869777372}
   - {fileID: 3398102290312997121}
+  - {fileID: 8836623386319129792}
   - {fileID: 3263861085083833252}
   - {fileID: 6304661960614946910}
   m_Father: {fileID: 0}
@@ -386,8 +436,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0898dbeedf5147f4880b10de2f6d8395, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _seats: []
   _driverSeat: {fileID: 38007765146249272}
+  _seats:
+  - {fileID: 38007765146249272}
+  - {fileID: 3803506554278187832}
 --- !u!1 &6282763862019147227
 GameObject:
   m_ObjectHideFlags: 0

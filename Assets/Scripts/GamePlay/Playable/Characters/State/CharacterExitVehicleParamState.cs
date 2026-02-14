@@ -7,9 +7,9 @@ namespace GamePlay.Playable.Characters.State
 {
     public class CharacterExitVehicleParamState : ParamBaseState<CarVehicle>
     {
-        private PlayerController _playerController;
+        private BaseCharacterController _playerController;
 
-        public CharacterExitVehicleParamState(PlayerController context) : base(context)
+        public CharacterExitVehicleParamState(BaseCharacterController context) : base(context)
         {
             _playerController = context;
         }

@@ -6,23 +6,25 @@ using UnityEngine;
 
 namespace GamePlay.Playable.Characters.State
 {
-    public class CharacterEnterVehicleParamState : ParamBaseState<CarVehicle>
+    public class CharacterChangeSeatParamState : ParamBaseState<CharacterChangeSeatParamState.VehicleData>
     {
-        private BaseCharacterController _playerController;
-
-        public CharacterEnterVehicleParamState(BaseCharacterController context) : base(context)
+        public struct VehicleData
         {
-            _playerController = context;
+            public CarVehicle Vehicle;
+            public Seat Seat;
+        }
+
+        public CharacterChangeSeatParamState(IStateContext context) : base(context)
+        {
         }
 
         public override void Enter()
         {
-            var freeSeat = Data.TryEnterCar(_playerController);
-            if (freeSeat is DriverSeat driverSeat)
+            if (Data.Seat is DriverSeat driverSeat)
             {
                 var data = new CharacterDrivingVehicleParamState.VehicleData
                 {
-                    Vehicle = Data,
+                    Vehicle = Data.Vehicle,
                     DriverSeat = driverSeat
                 };
                 Context
@@ -33,8 +35,8 @@ namespace GamePlay.Playable.Characters.State
             {
                 var data = new CharacterSeatParamState.VehicleData
                 {
-                    Vehicle = Data,
-                    Seat = freeSeat
+                    Vehicle = Data.Vehicle,
+                    Seat = Data.Seat
                 };
                 Context
                     .SwitchStateWithData<CharacterSeatParamState,

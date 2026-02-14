@@ -8,21 +8,20 @@ using UnityEngine;
 
 namespace GamePlay.Playable.Characters.State
 {
-    public class
-        CharacterDrivingVehicleParamState : TickableParamBaseState<CharacterDrivingVehicleParamState.VehicleData>
+    public class CharacterSeatParamState : ParamBaseState<CharacterSeatParamState.VehicleData>
     {
         public struct VehicleData
         {
             public CarVehicle Vehicle;
-            public DriverSeat DriverSeat;
+            public Seat Seat;
         }
-        
+
         private BaseCharacterController _baseCharacterController;
         private CharacterController _characterController;
         private CharacterAnimationController _characterAnimationController;
         private VehicleInputHandler _inputHandler;
 
-        public CharacterDrivingVehicleParamState(BaseCharacterController context, CharacterController characterController,
+        public CharacterSeatParamState(BaseCharacterController context, CharacterController characterController,
             CharacterAnimationController characterAnimationController, VehicleInputHandler inputHandler) :
             base(context)
         {
@@ -32,20 +31,15 @@ namespace GamePlay.Playable.Characters.State
             _inputHandler = inputHandler;
         }
 
-        public override void Tick(float deltaTime)
-        {
-        }
-
         public override void Enter()
         {
             _characterController.enabled = false;
-            _characterAnimationController.SwitchToDrivingLayer();
+            _characterAnimationController.SwitchToSeatLayer();
             _characterAnimationController.ResetBodyOrientation();
+
             _inputHandler.InteractPressed.AddListener(ExitVehicle);
             _inputHandler.ChangeSeatPressed.AddListener(ChangeSeat);
             _inputHandler.Enable();
-
-            Data.DriverSeat.SetInputData(_inputHandler.CarVehicleInputData);
         }
 
         public override void Exit()
@@ -53,8 +47,6 @@ namespace GamePlay.Playable.Characters.State
             _inputHandler.InteractPressed.RemoveListener(ExitVehicle);
             _inputHandler.ChangeSeatPressed.RemoveListener(ChangeSeat);
             _inputHandler.Disable();
-
-            Data.DriverSeat.SetInputData(null);
         }
 
         private void ChangeSeat()
@@ -65,7 +57,7 @@ namespace GamePlay.Playable.Characters.State
                 Vehicle = Data.Vehicle,
                 Seat = seat
             };
-
+            
             Context.SwitchStateWithData<CharacterChangeSeatParamState, CharacterChangeSeatParamState.VehicleData>(data);
         }
 

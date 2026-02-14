@@ -25,7 +25,8 @@ namespace GamePlay.Playable.Characters.Animation
 
         private readonly string BASE_LAYER_NAME = "Base Layer";
         private readonly string DRIVING_LAYER_NAME = "Driving Layer";
-
+        private readonly string SEAT_LAYER_NAME = "Seat Layer";
+        
 
         private Vector2 _moveDirection = Vector2.zero;
 
@@ -48,14 +49,23 @@ namespace GamePlay.Playable.Characters.Animation
         {
             CharacterAnimator.SetLayerWeight(CharacterAnimator.GetLayerIndex(BASE_LAYER_NAME), 1);
             CharacterAnimator.SetLayerWeight(CharacterAnimator.GetLayerIndex(DRIVING_LAYER_NAME), 0);
+            CharacterAnimator.SetLayerWeight(CharacterAnimator.GetLayerIndex(SEAT_LAYER_NAME), 0);
         }
 
         public void SwitchToDrivingLayer()
         {
             CharacterAnimator.SetLayerWeight(CharacterAnimator.GetLayerIndex(BASE_LAYER_NAME), 0);
             CharacterAnimator.SetLayerWeight(CharacterAnimator.GetLayerIndex(DRIVING_LAYER_NAME), 1);
+            CharacterAnimator.SetLayerWeight(CharacterAnimator.GetLayerIndex(SEAT_LAYER_NAME), 0);
         }
-
+        
+        public void SwitchToSeatLayer()
+        {
+            CharacterAnimator.SetLayerWeight(CharacterAnimator.GetLayerIndex(BASE_LAYER_NAME), 0);
+            CharacterAnimator.SetLayerWeight(CharacterAnimator.GetLayerIndex(DRIVING_LAYER_NAME), 0);
+            CharacterAnimator.SetLayerWeight(CharacterAnimator.GetLayerIndex(SEAT_LAYER_NAME), 1);
+        }
+        
         public void ResetBodyOrientation()
         {
             transform.localRotation = Quaternion.identity;

@@ -1,4 +1,5 @@
 using GamePlay.Playable;
+using GamePlay.Playable.Characters;
 using UnityEngine;
 
 namespace GamePlay.Vehicle.Car.Seats
@@ -12,11 +13,16 @@ namespace GamePlay.Vehicle.Car.Seats
         private Transform _doorPlayerPivot;
 
         [SerializeField]
-        private PlayerController _player;
+        private BaseCharacterController _player;
 
-        public bool HasFree => _player == null;
+        public BaseCharacterController Player => _player;
 
-        public bool TryAttach(PlayerController player)
+        [SerializeField]
+        private bool _test;
+
+        public bool HasFree => _test == false && _player == null;
+
+        public bool TryAttach(BaseCharacterController player)
         {
             if (HasFree == false)
                 return false;
@@ -30,13 +36,25 @@ namespace GamePlay.Vehicle.Car.Seats
 
         public void Detach()
         {
-            if (HasFree)
+            if (_player == null)
                 return;
-            
+
             _player.transform.SetParent(null);
             _player.transform.position = _doorPlayerPivot.position;
-            //_player.transform.rotation = Quaternion.identity;
             _player = null;
+        }
+
+        public bool TransferTo(Seat seat)
+        {
+            if (seat == null || HasFree)
+                return false;
+
+            if (seat.TryAttach(_player) == false)
+                return false;
+
+            _player = null;
+
+            return true;
         }
     }
 }
