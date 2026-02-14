@@ -1,6 +1,7 @@
 using Gameplay.Core.StateMachine;
 using Gameplay.Core.StateMachine.Interfaces;
 using GamePlay.Input;
+using GamePlay.Input.InputHandler;
 using GamePlay.Playable.Characters.Animation;
 using GamePlay.Vehicle.Car;
 using GamePlay.Vehicle.Car.Seats;

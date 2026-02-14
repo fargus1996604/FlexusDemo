@@ -1,6 +1,5 @@
 using Gameplay.Core.StateMachine;
-using Gameplay.Core.StateMachine.Interfaces;
-using GamePlay.Input;
+using GamePlay.Input.InputHandler;
 using GamePlay.Playable.Characters.Animation;
 using GamePlay.Vehicle.Car;
 using GamePlay.Vehicle.Car.Seats;
@@ -9,7 +8,7 @@ using UnityEngine;
 namespace GamePlay.Playable.Characters.State
 {
     public class
-        CharacterDrivingVehicleParamState : TickableParamBaseState<CharacterDrivingVehicleParamState.VehicleData>
+        CharacterDrivingVehicleParamState : ParamBaseState<CharacterDrivingVehicleParamState.VehicleData>
     {
         public struct VehicleData
         {
@@ -30,10 +29,6 @@ namespace GamePlay.Playable.Characters.State
             _characterController = characterController;
             _characterAnimationController = characterAnimationController;
             _inputHandler = inputHandler;
-        }
-
-        public override void Tick(float deltaTime)
-        {
         }
 
         public override void Enter()

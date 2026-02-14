@@ -17,7 +17,7 @@ namespace GamePlay.Playable.Characters.State
         public override void Enter()
         {
             Data.ExitCar(_playerController);
-            Context.SwitchState<CharacterExploringState>();
+            Context.SwitchState<CharacterBaseState>();
         }
 
         public override void Exit()

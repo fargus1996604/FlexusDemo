@@ -1,13 +1,13 @@
 using Gameplay.Core.StateMachine;
 using Gameplay.Core.StateMachine.Interfaces;
-using GamePlay.Input;
+using GamePlay.Input.InputHandler;
 using GamePlay.Playable.Characters.Animation;
 using GamePlay.Vehicle.Car;
 using UnityEngine;
 
 namespace GamePlay.Playable.Characters.State
 {
-    public class CharacterExploringState : TickableBaseState
+    public class CharacterBaseState : TickableBaseState
     {
         private BaseCharacterController.PlayerData _data;
         private CharacterController _characterController;
@@ -15,7 +15,7 @@ namespace GamePlay.Playable.Characters.State
         private PlayerInputHandler _inputHandler;
         private Camera _camera;
 
-        public CharacterExploringState(IStateContext context, BaseCharacterController.PlayerData data,
+        public CharacterBaseState(IStateContext context, BaseCharacterController.PlayerData data,
             CharacterController characterController, CharacterAnimationController characterAnimationController,
             PlayerInputHandler inputHandler,
             Camera camera) : base(context)

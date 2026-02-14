@@ -1,8 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using GamePlay.Input;
-using GamePlay.Playable;
 using GamePlay.Playable.Characters;
 using GamePlay.Vehicle.Car.Seats;
 using UnityEngine;

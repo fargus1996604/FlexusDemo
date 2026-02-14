@@ -1,7 +1,4 @@
-using System;
-using GamePlay.Input;
 using UnityEngine;
-using UnityEngine.InputSystem;
 
 namespace GamePlay.Vehicle.Car
 {
@@ -31,9 +28,7 @@ namespace GamePlay.Vehicle.Car
 
         [SerializeField]
         private float _brakeTorque;
-
-        private UserInputSystem _inputSystem;
-
+        
         private float _throttleInput;
         private float _steeringInput;
         private float _steeringAngle;

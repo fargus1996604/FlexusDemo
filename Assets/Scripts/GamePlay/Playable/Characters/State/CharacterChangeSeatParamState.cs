@@ -2,7 +2,6 @@ using Gameplay.Core.StateMachine;
 using Gameplay.Core.StateMachine.Interfaces;
 using GamePlay.Vehicle.Car;
 using GamePlay.Vehicle.Car.Seats;
-using UnityEngine;
 
 namespace GamePlay.Playable.Characters.State
 {
