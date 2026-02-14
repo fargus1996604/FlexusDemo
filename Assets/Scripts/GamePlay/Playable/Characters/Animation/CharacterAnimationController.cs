@@ -1,5 +1,6 @@
 using System;
 using UnityEngine;
+using UnityEngine.Events;
 
 namespace GamePlay.Playable.Characters.Animation
 {
@@ -9,6 +10,8 @@ namespace GamePlay.Playable.Characters.Animation
         private Animator _characterAnimator;
         protected Animator CharacterAnimator => _characterAnimator ??= GetComponent<Animator>();
 
+        public UnityEvent OnFootStep;
+        
         [SerializeField]
         private float _movingInterpolation = 1f;
         public float MovingInterpolation => _movingInterpolation;
@@ -108,6 +111,11 @@ namespace GamePlay.Playable.Characters.Animation
             
             CharacterAnimator.SetIKPositionWeight(AvatarIKGoal.LeftHand, 0);
             CharacterAnimator.SetIKPositionWeight(AvatarIKGoal.RightHand, 0);
+        }
+
+        public void CallFootStepEvent()
+        {
+            OnFootStep?.Invoke();
         }
         
         private void OnAnimatorMove()

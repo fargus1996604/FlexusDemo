@@ -1169,6 +1169,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 3956578154367940257, guid: 025f2bbe01c52e044b215cbc626d2d9a, type: 3}
+      propertyPath: m_Name
+      value: StepsSource
+      objectReference: {fileID: 0}
     - target: {fileID: 5571897771675895499, guid: 025f2bbe01c52e044b215cbc626d2d9a, type: 3}
       propertyPath: m_Name
       value: PlayerController
