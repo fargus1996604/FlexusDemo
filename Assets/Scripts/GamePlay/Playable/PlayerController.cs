@@ -15,6 +15,9 @@ namespace GamePlay.Playable
         [SerializeField]
         private InputController _inputController;
 
+        [SerializeField]
+        private CameraController _cameraController;
+
         private VehicleInputHandler _vehicleInputHandler;
 
         private void Start()
@@ -23,14 +26,17 @@ namespace GamePlay.Playable
             States = new List<BaseState>()
             {
                 new CharacterBaseState(this, Data, CharacterController, CharacterAnimationController,
-                    _inputController.GetPlayerInputHandler(), Camera.main),
+                    _inputController.GetPlayerInputHandler(), _cameraController, Camera.main),
                 new CharacterEnterVehicleParamState(this),
                 new CharacterExitVehicleParamState(this),
                 new CharacterDrivingVehicleParamState(this, CharacterController, CharacterAnimationController,
-                    _vehicleInputHandler),
+                    _vehicleInputHandler, _cameraController),
                 new CharacterSeatParamState(this, CharacterController, CharacterAnimationController,
                     _vehicleInputHandler),
-                new CharacterChangeSeatParamState(this)
+                new CharacterChangeSeatParamState(this),
+                new CharacterSeatMiniGunParamState(this,
+                    CharacterController, CharacterAnimationController,
+                    _vehicleInputHandler, _cameraController),
             };
 
             SwitchState<CharacterBaseState>();

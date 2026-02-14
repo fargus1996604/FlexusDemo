@@ -29,6 +29,18 @@ namespace GamePlay.Playable.Characters.State
                     .SwitchStateWithData<CharacterDrivingVehicleParamState,
                         CharacterDrivingVehicleParamState.VehicleData>(data);
             }
+            else if (freeSeat is MiniGunSeat miniGunSeat)
+            {
+                var data = new CharacterSeatMiniGunParamState.OutData()
+                {
+                    Vehicle = Data,
+                    MiniGunSeat = miniGunSeat,
+                    MiniGunController = miniGunSeat.Controller
+                };
+                Context
+                    .SwitchStateWithData<CharacterSeatMiniGunParamState,
+                        CharacterSeatMiniGunParamState.OutData>(data);
+            }
             else
             {
                 var data = new CharacterSeatParamState.VehicleData

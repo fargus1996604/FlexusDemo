@@ -358,6 +358,15 @@ namespace GamePlay.Input
                     ""processors"": """",
                     ""interactions"": """",
                     ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""Fire"",
+                    ""type"": ""Button"",
+                    ""id"": ""e30e995d-77ea-47c4-a966-247e07580f28"",
+                    ""expectedControlType"": """",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
                 }
             ],
             ""bindings"": [
@@ -545,6 +554,28 @@ namespace GamePlay.Input
                     ""processors"": """",
                     ""groups"": """",
                     ""action"": ""ChangeSeat"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""edbc8f60-a356-48e9-b3a2-8700928df794"",
+                    ""path"": ""<Mouse>/leftButton"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Fire"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""117002d5-7743-47e1-ab17-a84cce957874"",
+                    ""path"": ""<Keyboard>/k"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Fire"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
                 }
@@ -1143,6 +1174,7 @@ namespace GamePlay.Input
             m_Vehicle_Interact = m_Vehicle.FindAction("Interact", throwIfNotFound: true);
             m_Vehicle_Brake = m_Vehicle.FindAction("Brake", throwIfNotFound: true);
             m_Vehicle_ChangeSeat = m_Vehicle.FindAction("ChangeSeat", throwIfNotFound: true);
+            m_Vehicle_Fire = m_Vehicle.FindAction("Fire", throwIfNotFound: true);
             // UI
             m_UI = asset.FindActionMap("UI", throwIfNotFound: true);
             m_UI_Navigate = m_UI.FindAction("Navigate", throwIfNotFound: true);
@@ -1371,6 +1403,7 @@ namespace GamePlay.Input
         private readonly InputAction m_Vehicle_Interact;
         private readonly InputAction m_Vehicle_Brake;
         private readonly InputAction m_Vehicle_ChangeSeat;
+        private readonly InputAction m_Vehicle_Fire;
         /// <summary>
         /// Provides access to input actions defined in input action map "Vehicle".
         /// </summary>
@@ -1402,6 +1435,10 @@ namespace GamePlay.Input
             /// Provides access to the underlying input action "Vehicle/ChangeSeat".
             /// </summary>
             public InputAction @ChangeSeat => m_Wrapper.m_Vehicle_ChangeSeat;
+            /// <summary>
+            /// Provides access to the underlying input action "Vehicle/Fire".
+            /// </summary>
+            public InputAction @Fire => m_Wrapper.m_Vehicle_Fire;
             /// <summary>
             /// Provides access to the underlying input action map instance.
             /// </summary>
@@ -1443,6 +1480,9 @@ namespace GamePlay.Input
                 @ChangeSeat.started += instance.OnChangeSeat;
                 @ChangeSeat.performed += instance.OnChangeSeat;
                 @ChangeSeat.canceled += instance.OnChangeSeat;
+                @Fire.started += instance.OnFire;
+                @Fire.performed += instance.OnFire;
+                @Fire.canceled += instance.OnFire;
             }
 
             /// <summary>
@@ -1469,6 +1509,9 @@ namespace GamePlay.Input
                 @ChangeSeat.started -= instance.OnChangeSeat;
                 @ChangeSeat.performed -= instance.OnChangeSeat;
                 @ChangeSeat.canceled -= instance.OnChangeSeat;
+                @Fire.started -= instance.OnFire;
+                @Fire.performed -= instance.OnFire;
+                @Fire.canceled -= instance.OnFire;
             }
 
             /// <summary>
@@ -1840,6 +1883,13 @@ namespace GamePlay.Input
             /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
             /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
             void OnChangeSeat(InputAction.CallbackContext context);
+            /// <summary>
+            /// Method invoked when associated input action "Fire" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
+            /// </summary>
+            /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
+            /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
+            /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
+            void OnFire(InputAction.CallbackContext context);
         }
         /// <summary>
         /// Interface to implement callback methods for all input action callbacks associated with input actions defined by "UI" which allows adding and removing callbacks.

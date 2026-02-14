@@ -13,17 +13,19 @@ namespace GamePlay.Playable.Characters.State
         private CharacterController _characterController;
         private CharacterAnimationController _characterAnimationController;
         private PlayerInputHandler _inputHandler;
+        private CameraController _cameraController;
         private Camera _camera;
 
         public CharacterBaseState(IStateContext context, BaseCharacterController.PlayerData data,
             CharacterController characterController, CharacterAnimationController characterAnimationController,
-            PlayerInputHandler inputHandler,
+            PlayerInputHandler inputHandler,CameraController cameraController,
             Camera camera) : base(context)
         {
             _data = data;
             _characterController = characterController;
             _characterAnimationController = characterAnimationController;
             _inputHandler = inputHandler;
+            _cameraController = cameraController;
             _camera = camera;
         }
 
@@ -54,6 +56,7 @@ namespace GamePlay.Playable.Characters.State
 
         public override void Enter()
         {
+            _cameraController.ActivateDefaultCamera(_characterController.transform);
             _characterController.enabled = true;
             _characterAnimationController.SwitchToBaseLayer();
             _inputHandler.InteractPressed.AddListener(FindClosestVehicles);

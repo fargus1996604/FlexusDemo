@@ -16,11 +16,8 @@ namespace GamePlay.Vehicle.Car.Seats
         private BaseCharacterController _player;
 
         public BaseCharacterController Player => _player;
-
-        [SerializeField]
-        private bool _test;
-
-        public bool HasFree => _test == false && _player == null;
+        
+        public bool HasFree => _player == null;
 
         public bool TryAttach(BaseCharacterController player)
         {
@@ -36,7 +33,7 @@ namespace GamePlay.Vehicle.Car.Seats
 
         public void Detach()
         {
-            if (_player == null)
+            if (HasFree)
                 return;
 
             _player.transform.SetParent(null);
