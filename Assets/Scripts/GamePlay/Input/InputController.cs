@@ -1,32 +1,72 @@
 using System;
 using GamePlay.Playable;
+using GamePlay.Vehicle.Car;
 using UnityEngine;
+using UnityEngine.Events;
 using UnityEngine.InputSystem;
 
 namespace GamePlay.Input
 {
-    public class InputController : MonoBehaviour , UserInputSystem.IPlayerActions
+    public class InputController : MonoBehaviour
     {
         [SerializeField]
         private PlayerController _playerController;
-        
-        private IInputHandler _handler;
+
         private UserInputSystem _inputSystem;
 
-        
-        private void Start()
+        private void Awake()
         {
             _inputSystem = new UserInputSystem();
-            _inputSystem.Player.SetCallbacks(this);
-            _inputSystem.Player.Enable();
-            _handler = _playerController;
             Cursor.lockState = CursorLockMode.Locked;
             Cursor.visible = false;
         }
 
+        public PlayerInputHandler GetPlayerInputHandler()
+        {
+            return new PlayerInputHandler(_inputSystem);
+        }
+
+        public VehicleInputHandler GetVehicleInputHandler()
+        {
+            return new VehicleInputHandler(_inputSystem);
+        }
+    }
+
+    public interface IInputHandler
+    {
+    }
+
+    public class PlayerInputHandler : IInputHandler, UserInputSystem.IPlayerActions
+    {
+        public UnityEvent InteractPressed = new UnityEvent();
+
+        private UserInputSystem _inputSystem;
+
+        private Vector2 _move;
+        public Vector2 Move => _move;
+
+        private bool _isSprinting;
+        public bool IsSprinting => _isSprinting;
+
+        public PlayerInputHandler(UserInputSystem userInputSystem)
+        {
+            _inputSystem = userInputSystem;
+            _inputSystem.Player.SetCallbacks(this);
+        }
+
+        public void Enable()
+        {
+            _inputSystem.Enable();
+        }
+
+        public void Disable()
+        {
+            _inputSystem.Disable();
+        }
+
         public void OnMove(InputAction.CallbackContext context)
         {
-            _handler.OnMove(context.ReadValue<Vector2>()); 
+            _move = context.ReadValue<Vector2>();
         }
 
         public void OnLook(InputAction.CallbackContext context)
@@ -35,17 +75,67 @@ namespace GamePlay.Input
 
         public void OnInteract(InputAction.CallbackContext context)
         {
+            if (context.ReadValueAsButton())
+            {
+                InteractPressed?.Invoke();
+            }
         }
 
         public void OnSprint(InputAction.CallbackContext context)
         {
-            _handler.OnSprint(context.ReadValueAsButton());
+            _isSprinting = context.ReadValueAsButton();
         }
     }
 
-    public interface IInputHandler
+    public class VehicleInputHandler : IInputHandler, UserInputSystem.IVehicleActions
     {
-        void OnMove(Vector2 axes);
-        void OnSprint(bool engaged);
+        public UnityEvent InteractPressed = new UnityEvent();
+
+
+        private CarVehicleInputData _carVehicleInputData;
+        public CarVehicleInputData CarVehicleInputData => _carVehicleInputData;
+
+        private UserInputSystem _inputSystem;
+
+        public VehicleInputHandler(UserInputSystem userInputSystem)
+        {
+            _inputSystem = userInputSystem;
+            _inputSystem.Vehicle.SetCallbacks(this);
+            _carVehicleInputData = new CarVehicleInputData();
+        }
+
+        public void Enable()
+        {
+            _inputSystem.Enable();
+        }
+
+        public void Disable()
+        {
+            _inputSystem.Disable();
+        }
+
+        public void OnMove(InputAction.CallbackContext context)
+        {
+            var axes = context.ReadValue<Vector2>();
+            _carVehicleInputData.Throttle = axes.y;
+            _carVehicleInputData.Steering = axes.x;
+        }
+
+        public void OnLook(InputAction.CallbackContext context)
+        {
+        }
+
+        public void OnInteract(InputAction.CallbackContext context)
+        {
+            if (context.ReadValueAsButton())
+            {
+                InteractPressed?.Invoke();
+            }
+        }
+
+        public void OnBrake(InputAction.CallbackContext context)
+        {
+            _carVehicleInputData.IsBraking = context.ReadValueAsButton();
+        }
     }
 }

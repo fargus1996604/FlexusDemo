@@ -10,10 +10,10 @@ namespace GamePlay.Playable.Characters.Animation
 
         [SerializeField]
         private float _movingInterpolation = 1f;
+        public float MovingInterpolation => _movingInterpolation;
 
         [SerializeField]
         private Transform _bodyOrientationPivot;
-
 
         private Vector3 _deltaPosition;
         public Vector3 DeltaPosition => _deltaPosition;
@@ -23,6 +23,9 @@ namespace GamePlay.Playable.Characters.Animation
         private readonly int DASH_BOOLEAN_KEY = Animator.StringToHash("Dash");
         private readonly int FORWARD_LOKOING_FLOAT_KEY = Animator.StringToHash("ForwardLooking");
 
+        private readonly string BASE_LAYER_NAME = "Base Layer";
+        private readonly string DRIVING_LAYER_NAME = "Driving Layer";
+
 
         private Vector2 _moveDirection = Vector2.zero;
 
@@ -31,22 +34,33 @@ namespace GamePlay.Playable.Characters.Animation
             _moveDirection = Vector2.Lerp(_moveDirection, direction, _movingInterpolation * Time.deltaTime);
             CharacterAnimator.SetFloat(MOVE_X_FLOAT_KEY, _moveDirection.x);
             CharacterAnimator.SetFloat(MOVE_Y_FLOAT_KEY, _moveDirection.y);
-
+            
             if (direction != Vector2.zero)
             {
-                var lookRotation = Quaternion.LookRotation(cameraForward);
-                lookRotation.x = 0;
-                lookRotation.z = 0;
-                transform.localRotation = Quaternion.LerpUnclamped(transform.localRotation, lookRotation,
-                    _movingInterpolation * Time.deltaTime);
-
                 if (Mathf.Abs(_moveDirection.y) > 0.9f)
                 {
-                    CharacterAnimator.SetFloat(FORWARD_LOKOING_FLOAT_KEY,GetForwardLooking(cameraForward));
+                    CharacterAnimator.SetFloat(FORWARD_LOKOING_FLOAT_KEY, GetForwardLooking(cameraForward));
                 }
             }
         }
 
+        public void SwitchToBaseLayer()
+        {
+            CharacterAnimator.SetLayerWeight(CharacterAnimator.GetLayerIndex(BASE_LAYER_NAME), 1);
+            CharacterAnimator.SetLayerWeight(CharacterAnimator.GetLayerIndex(DRIVING_LAYER_NAME), 0);
+        }
+
+        public void SwitchToDrivingLayer()
+        {
+            CharacterAnimator.SetLayerWeight(CharacterAnimator.GetLayerIndex(BASE_LAYER_NAME), 0);
+            CharacterAnimator.SetLayerWeight(CharacterAnimator.GetLayerIndex(DRIVING_LAYER_NAME), 1);
+        }
+
+        public void ResetBodyOrientation()
+        {
+            transform.localRotation = Quaternion.identity;
+        }
+        
         public void SetDash(bool dash)
         {
             CharacterAnimator.SetBool(DASH_BOOLEAN_KEY, dash);

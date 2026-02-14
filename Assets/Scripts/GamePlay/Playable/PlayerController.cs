@@ -1,50 +1,114 @@
 using System;
+using System.Collections.Generic;
+using System.Linq;
+using Gameplay.Core;
+using Gameplay.Core.StateMachine;
+using Gameplay.Core.StateMachine.Interfaces;
 using GamePlay.Input;
 using GamePlay.Playable.Characters.Animation;
+using GamePlay.Playable.Characters.State;
 using UnityEngine;
-using UnityEngine.InputSystem;
-using UnityEngine.Serialization;
+
 
 namespace GamePlay.Playable
 {
-    public class PlayerController : MonoBehaviour, IInputHandler
+    public class PlayerController : MonoBehaviour, IStateContext
     {
-        [FormerlySerializedAs("animationController")]
-        [FormerlySerializedAs("_animatorController")]
+        [System.Serializable]
+        public class PlayerData
+        {
+            public float Gravity = -9.81f;
+            public Vector3 Velocity;
+            public float VehicleDetectionRadius;
+        }
+
+        [SerializeField]
+        private PlayerData _playerData;
+
         [SerializeField]
         private CharacterAnimationController _animationController;
 
         [SerializeField]
         private CharacterController _characterController;
 
-        private float _gravity = -9.81f;
-        private bool _isGrounded;
-        private Vector3 _velocity;
-        private Vector2 _movement;
+        [SerializeField]
+        private InputController _inputController;
+
+        private List<BaseState> _states;
+        private BaseState _state;
+        private ITickable _tickableState;
+
+        private void Start()
+        {
+            _states = new List<BaseState>()
+            {
+                new CharacterExploringState(this, _playerData, _characterController, _animationController,
+                    _inputController.GetPlayerInputHandler(), Camera.main),
+                new CharacterEnterVehicleParamState(this),
+                new CharacterExitVehicleParamState(this),
+                new CharacterDrivingVehicleParamState(this, _characterController, _animationController,
+                    _inputController.GetVehicleInputHandler())
+            };
+
+            SwitchState<CharacterExploringState>();
+        }
 
         private void Update()
         {
-            _isGrounded = _characterController.isGrounded;
-            if (_isGrounded && _velocity.y < 0)
+            if (_tickableState != null)
+                _tickableState.Tick(Time.deltaTime);
+        }
+
+        public void SwitchStateWithData<T, TD>(TD data) where T : ParamBaseState<TD>
+        {
+            var pendingState = _states.OfType<T>().FirstOrDefault();
+            if (pendingState is ParamBaseState<TD> paramBaseState)
             {
-                _velocity.y = -2f;
+                if (data == null)
+                {
+                    Debug.LogError($"Data is null: {typeof(T)}");
+                    return;
+                }
+
+                paramBaseState.PutData(data);
             }
 
-            _velocity.y += _gravity * Time.deltaTime;
-            _characterController.Move(_animationController.DeltaPosition + (_velocity * Time.deltaTime));
-
-            var cameraLook = Camera.main.transform.forward;
-            _animationController.Move(_movement, cameraLook);
+            _state?.Exit();
+            _state = pendingState;
+            _tickableState = _state as ITickable;
+            _state?.Enter();
         }
 
-        public void OnMove(Vector2 axes)
+        public void SwitchState<T>() where T : BaseState
         {
-            _movement = axes;
+            var pendingState = _states.OfType<T>().FirstOrDefault();
+            if (pendingState is ParamBaseState<object>)
+            {
+                Debug.LogError(
+                    $"{pendingState.GetType()} is ParamBaseState. use SwitchStateWithData instead SwitchState ");
+                return;
+            }
+
+            _state?.Exit();
+            _state = pendingState;
+            _tickableState = _state as ITickable;
+            _state?.Enter();
         }
 
-        public void OnSprint(bool engaged)
+        public void SwitchState(Type stateType)
         {
-            _animationController.SetDash(engaged);
+            var pendingState = _states.Find(state => state.GetType() == stateType);
+            if (pendingState is ParamBaseState<object>)
+            {
+                Debug.LogError(
+                    $"{pendingState.GetType()} is ParamBaseState. use SwitchStateWithData instead SwitchState ");
+                return;
+            }
+
+            _state?.Exit();
+            _state = pendingState;
+            _tickableState = _state as ITickable;
+            _state?.Enter();
         }
     }
 }
