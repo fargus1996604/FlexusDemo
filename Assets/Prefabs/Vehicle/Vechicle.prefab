@@ -439,6 +439,7 @@ MonoBehaviour:
   _driverSeat: {fileID: 38007765146249272}
   _seats:
   - {fileID: 38007765146249272}
+  - {fileID: 3803506554278187832}
   - {fileID: 237267275385217430}
 --- !u!1 &6282763862019147227
 GameObject:

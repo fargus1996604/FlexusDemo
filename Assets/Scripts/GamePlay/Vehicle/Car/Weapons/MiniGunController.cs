@@ -56,9 +56,11 @@ namespace GamePlay.Vehicle.Car.Weapons
             _data = inputData;
         }
 
-        public void ResetLookDirection()
+        public void ResetGun()
         {
             _gunMesh.transform.forward = transform.forward;
+            _muzzleFlashParticle.Stop();
+            _sound.StopAllSounds();
         }
 
         public void Tick(float deltaTime)
@@ -70,6 +72,16 @@ namespace GamePlay.Vehicle.Car.Weapons
 
             if (CanFire)
             {
+                if (Physics.Raycast(_gunMesh.position, _gunMesh.forward, out RaycastHit hit, 30))
+                {
+                    if (hit.rigidbody != null)
+                    {
+                        Vector3 force = (hit.transform.position - hit.point).normalized * 300;
+                        hit.rigidbody.AddForce(force, ForceMode.Impulse);
+                    }
+                }
+                
+                
                 if (_muzzleFlashParticle.isPlaying == false)
                 {
                     _muzzleFlashParticle.Play();
@@ -79,7 +91,7 @@ namespace GamePlay.Vehicle.Car.Weapons
             {
                 if (_muzzleFlashParticle.isPlaying)
                 {
-                    _muzzleFlashParticle.Play();
+                    _muzzleFlashParticle.Stop();
                 }
             }
 

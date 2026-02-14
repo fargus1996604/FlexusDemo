@@ -60,7 +60,7 @@ namespace GamePlay.Playable.Characters.State
             _inputHandler.Enable();
             
             Data.MiniGunController.SetInputData(_inputData);
-            Data.MiniGunController.ResetLookDirection();
+            Data.MiniGunController.ResetGun();
         }
 
         public override void Exit()
@@ -69,6 +69,7 @@ namespace GamePlay.Playable.Characters.State
             _inputHandler.InteractPressed.RemoveListener(ExitVehicle);
             _inputHandler.ChangeSeatPressed.RemoveListener(ChangeSeat);
             _inputHandler.Disable();
+            Data.MiniGunController.ResetGun();
         }
 
         private void ChangeSeat()

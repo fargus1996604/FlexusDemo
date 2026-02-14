@@ -37,5 +37,12 @@ namespace GamePlay.Vehicle.Car.Weapons
                 _loopSource.Stop();
             }
         }
+        
+        public void StopAllSounds()
+        {
+            _startSource.Stop();
+            _loopSource.Stop();
+            _endSource.Stop();
+        }
     }
 }

@@ -77,6 +77,7 @@ namespace GamePlay.Playable.Characters.State
                 return;
 
             CarVehicle nearVehicle = null;
+            float closestDistance = float.MaxValue;
             foreach (var collider in colliders)
             {
                 if (collider.attachedRigidbody == null)
@@ -85,7 +86,20 @@ namespace GamePlay.Playable.Characters.State
                 if (collider.attachedRigidbody.TryGetComponent(out CarVehicle vehicle) == false)
                     continue;
 
-                nearVehicle = vehicle;
+                if (nearVehicle != null)
+                {
+                    float distamce = Vector3.Distance(_characterController.transform.position, vehicle.transform.position);
+                    if (distamce < closestDistance)
+                    {
+                        nearVehicle = vehicle;
+                        closestDistance = distamce;
+                    }
+                }
+                else
+                {
+                    closestDistance = Vector3.Distance(_characterController.transform.position, vehicle.transform.position);
+                    nearVehicle = vehicle;
+                }
             }
 
             if (nearVehicle == null)

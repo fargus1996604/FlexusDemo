@@ -28,10 +28,10 @@ namespace GamePlay.Playable.Characters
         private void OnFootStep()
         {
             float movingMagnitude = _characterAnimationController.DeltaPosition.magnitude;
-            if(movingMagnitude < 0.01f)
+            if(movingMagnitude < 0.001f)
                 return;
             
-            _audioSource.volume = movingMagnitude < 0.02f ? 0.5f : 1f;
+            _audioSource.volume = movingMagnitude < 0.02f ? 0.3f : 1f;
             
             if(Time.time - _lastStepTime < 0.1f)
                 return;
