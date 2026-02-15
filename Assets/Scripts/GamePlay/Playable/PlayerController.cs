@@ -6,6 +6,9 @@ using GamePlay.Input.InputHandler;
 using GamePlay.Playable.Characters;
 using GamePlay.Playable.Characters.Animation;
 using GamePlay.Playable.Characters.State;
+using TMPro;
+using Unity.Collections;
+using Unity.Netcode;
 using UnityEngine;
 
 namespace GamePlay.Playable
@@ -13,30 +16,49 @@ namespace GamePlay.Playable
     public class PlayerController : BaseCharacterController
     {
         [SerializeField]
-        private InputController _inputController;
-
+        private GameObject _networkPanel;
+        
         [SerializeField]
-        private CameraController _cameraController;
+        private TextMeshPro _playerNameLabel;
 
-        private VehicleInputHandler _vehicleInputHandler;
+        public override void OnNetworkSpawn()
+        {
+            if (IsOwner)
+            {
+                _networkPanel.SetActive(false);
+            }
+            else
+            {
+                _networkPanel.SetActive(true);
+                _playerNameLabel.text = "Player"+OwnerClientId;
+            }
+        }
 
         private void Start()
         {
-            _vehicleInputHandler = _inputController.GetVehicleInputHandler();
+            if(IsOwner == false)
+                return;
+            
+            var inputController = InputController.Instance;
+            var cameraController = CameraController.Instance;
+            
+            var vehicleInputHandler = inputController.GetVehicleInputHandler();
+            var playerInputHandler = inputController.GetPlayerInputHandler();
+            
             States = new List<BaseState>()
             {
                 new CharacterBaseState(this, Data, CharacterController, CharacterAnimationController,
-                    _inputController.GetPlayerInputHandler(), _cameraController, Camera.main),
+                    playerInputHandler, cameraController, Camera.main),
                 new CharacterEnterVehicleParamState(this),
                 new CharacterExitVehicleParamState(this),
                 new CharacterDrivingVehicleParamState(this, CharacterController, CharacterAnimationController,
-                    _vehicleInputHandler, _cameraController),
+                    vehicleInputHandler, cameraController),
                 new CharacterSeatParamState(this, CharacterController, CharacterAnimationController,
-                    _vehicleInputHandler),
+                    vehicleInputHandler),
                 new CharacterChangeSeatParamState(this),
                 new CharacterSeatMiniGunParamState(this,
                     CharacterController, CharacterAnimationController,
-                    _vehicleInputHandler, _cameraController),
+                    vehicleInputHandler, cameraController),
             };
 
             SwitchState<CharacterBaseState>();

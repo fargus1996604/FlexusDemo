@@ -1,9 +1,10 @@
+using Core.Singleton;
 using GamePlay.Input.InputHandler;
 using UnityEngine;
 
 namespace GamePlay.Input
 {
-    public class InputController : MonoBehaviour
+    public class InputController : Singleton<InputController>
     {
         private UserInputSystem _inputSystem;
 

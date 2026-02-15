@@ -5,12 +5,13 @@ using Gameplay.Core;
 using Gameplay.Core.StateMachine;
 using Gameplay.Core.StateMachine.Interfaces;
 using GamePlay.Playable.Characters.Animation;
+using Unity.Netcode;
 using UnityEngine;
 
 namespace GamePlay.Playable.Characters
 {
     [RequireComponent(typeof(CharacterController))]
-    public class BaseCharacterController : MonoBehaviour, IStateContext
+    public class BaseCharacterController : NetworkBehaviour, IStateContext
     {
         [System.Serializable]
         public class PlayerData

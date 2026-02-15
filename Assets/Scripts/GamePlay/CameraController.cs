@@ -1,9 +1,10 @@
+using Core.Singleton;
 using Unity.Cinemachine;
 using UnityEngine;
 
 namespace GamePlay
 {
-    public class CameraController : MonoBehaviour
+    public class CameraController : Singleton<CameraController>
     {
         [SerializeField]
         private CinemachineCamera _defaultCamera;
