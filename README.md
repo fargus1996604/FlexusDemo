@@ -1,6 +1,6 @@
 # FlexusDemo
 
-Minimal Unity gameplay prototype demonstrating basic character moving and interaction with car.
+Minimal Unity gameplay prototype demonstrating basic character moving, interaction with car, and simple co-op feature.
 
 ## 🎮 Input Bindings
 
@@ -9,7 +9,7 @@ Minimal Unity gameplay prototype demonstrating basic character moving and intera
 | W A S D | Move Character        |
 | E       | Enter / Exit Vehicle  |
 | G       | Switch Car Seat       |
-| Mouse1  | MachineGun Weapon     |
+| Mouse1  | Minigun Weapon        |
 
 ---
 
