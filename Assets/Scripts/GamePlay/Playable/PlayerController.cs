@@ -1,25 +1,29 @@
+using System;
 using System.Collections.Generic;
-using Gameplay.Core;
 using Gameplay.Core.StateMachine;
-using GamePlay.Input;
-using GamePlay.Input.InputHandler;
 using GamePlay.Playable.Characters;
-using GamePlay.Playable.Characters.Animation;
 using GamePlay.Playable.Characters.State;
+using GamePlay.Vehicle.Car.Weapons;
 using TMPro;
-using Unity.Collections;
 using Unity.Netcode;
 using UnityEngine;
 
 namespace GamePlay.Playable
 {
+    [RequireComponent(typeof(NetworkObject))]
     public class PlayerController : BaseCharacterController
     {
         [SerializeField]
         private GameObject _networkPanel;
-        
+
         [SerializeField]
         private TextMeshPro _playerNameLabel;
+
+        public PlayerInputData PlayerInput = new();
+        public VehicleInputData VehicleInput = new();
+
+        [SerializeField]
+        private NetworkVariable<int> _playerNumber;
 
         public override void OnNetworkSpawn()
         {
@@ -30,37 +34,30 @@ namespace GamePlay.Playable
             else
             {
                 _networkPanel.SetActive(true);
-                _playerNameLabel.text = "Player"+OwnerClientId;
+                _playerNameLabel.text = "Player" + OwnerClientId;
             }
-        }
 
-        private void Start()
-        {
-            if(IsOwner == false)
+            if (IsServer == false)
                 return;
-            
-            var inputController = InputController.Instance;
-            var cameraController = CameraController.Instance;
-            
-            var vehicleInputHandler = inputController.GetVehicleInputHandler();
-            var playerInputHandler = inputController.GetPlayerInputHandler();
-            
+
+
             States = new List<BaseState>()
             {
                 new CharacterBaseState(this, Data, CharacterController, CharacterAnimationController,
-                    playerInputHandler, cameraController, Camera.main),
+                    PlayerInput),
                 new CharacterEnterVehicleParamState(this),
                 new CharacterExitVehicleParamState(this),
                 new CharacterDrivingVehicleParamState(this, CharacterController, CharacterAnimationController,
-                    vehicleInputHandler, cameraController),
+                    VehicleInput),
                 new CharacterSeatParamState(this, CharacterController, CharacterAnimationController,
-                    vehicleInputHandler),
+                    VehicleInput),
                 new CharacterChangeSeatParamState(this),
                 new CharacterSeatMiniGunParamState(this,
                     CharacterController, CharacterAnimationController,
-                    vehicleInputHandler, cameraController),
+                    VehicleInput),
             };
 
+            OnStateBeginChange.AddListener(OnStateBeginChanged);
             SwitchState<CharacterBaseState>();
         }
 
@@ -68,6 +65,30 @@ namespace GamePlay.Playable
         {
             if (TickableState != null)
                 TickableState.Tick(Time.deltaTime);
+        }
+
+        private void OnStateBeginChanged(Type type, object param)
+        {
+            if (type == typeof(CharacterSeatMiniGunParamState))
+            {
+                if (param is CharacterSeatMiniGunParamState.OutData outData)
+                {
+                    CallChangeCameraRpc(CameraController.State.Minigun, outData.MiniGunController);
+                }
+            }
+            else
+            {
+                CallChangeCameraRpc(CameraController.State.Default, this);
+            }
+        }
+
+        [Rpc(SendTo.Owner)]
+        private void CallChangeCameraRpc(CameraController.State state,
+            NetworkBehaviourReference networkBehaviourReference)
+        {
+            if (networkBehaviourReference.TryGet(out NetworkBehaviour behaviour) == false)
+                return;
+            CameraController.Instance.Activate(state, behaviour.transform);
         }
     }
 }

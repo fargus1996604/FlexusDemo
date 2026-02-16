@@ -7,12 +7,17 @@ using Gameplay.Core.StateMachine.Interfaces;
 using GamePlay.Playable.Characters.Animation;
 using Unity.Netcode;
 using UnityEngine;
+using UnityEngine.Events;
+using UnityEngine.Serialization;
+using Object = UnityEngine.Object;
 
 namespace GamePlay.Playable.Characters
 {
     [RequireComponent(typeof(CharacterController))]
     public class BaseCharacterController : NetworkBehaviour, IStateContext
     {
+        public UnityEvent<Type, object> OnStateBeginChange;
+
         [System.Serializable]
         public class PlayerData
         {
@@ -23,20 +28,24 @@ namespace GamePlay.Playable.Characters
 
         [SerializeField]
         private PlayerData _data;
+
         public PlayerData Data => _data;
-        
+
         [SerializeField]
         private CharacterController _characterController;
-        protected CharacterController CharacterController => _characterController ??= GetComponent<CharacterController>();
-        
+
+        protected CharacterController CharacterController =>
+            _characterController ??= GetComponent<CharacterController>();
+
         [SerializeField]
         private CharacterAnimationController _characterAnimationController;
+
         protected CharacterAnimationController CharacterAnimationController => _characterAnimationController;
-        
+
         protected List<BaseState> States;
         protected BaseState State;
         protected ITickable TickableState;
-        
+
         public void SwitchStateWithData<T, TD>(TD data) where T : ParamBaseState<TD>
         {
             var pendingState = States.OfType<T>().FirstOrDefault();
@@ -54,6 +63,7 @@ namespace GamePlay.Playable.Characters
             State?.Exit();
             State = pendingState;
             TickableState = State as ITickable;
+            OnStateBeginChange?.Invoke(State.GetType(), data);
             State?.Enter();
         }
 
@@ -70,6 +80,7 @@ namespace GamePlay.Playable.Characters
             State?.Exit();
             State = pendingState;
             TickableState = State as ITickable;
+            OnStateBeginChange?.Invoke(State.GetType(), null);
             State?.Enter();
         }
 
@@ -86,6 +97,7 @@ namespace GamePlay.Playable.Characters
             State?.Exit();
             State = pendingState;
             TickableState = State as ITickable;
+            OnStateBeginChange?.Invoke(State.GetType(), null);
             State?.Enter();
         }
     }

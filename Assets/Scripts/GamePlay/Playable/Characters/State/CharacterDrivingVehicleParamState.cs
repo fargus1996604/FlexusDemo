@@ -1,5 +1,4 @@
 using Gameplay.Core.StateMachine;
-using GamePlay.Input.InputHandler;
 using GamePlay.Playable.Characters.Animation;
 using GamePlay.Vehicle.Car;
 using GamePlay.Vehicle.Car.Seats;
@@ -19,38 +18,33 @@ namespace GamePlay.Playable.Characters.State
         private BaseCharacterController _baseCharacterController;
         private CharacterController _characterController;
         private CharacterAnimationController _characterAnimationController;
-        private VehicleInputHandler _inputHandler;
-        private CameraController _cameraController;
+        private VehicleInputData _inputData;
 
         public CharacterDrivingVehicleParamState(BaseCharacterController context, CharacterController characterController,
-            CharacterAnimationController characterAnimationController, VehicleInputHandler inputHandler,CameraController cameraController) :
+            CharacterAnimationController characterAnimationController, VehicleInputData inputData) :
             base(context)
         {
             _baseCharacterController = context;
             _characterController = characterController;
             _characterAnimationController = characterAnimationController;
-            _inputHandler = inputHandler;
-            _cameraController = cameraController;
+            _inputData = inputData;
         }
 
         public override void Enter()
         {
-            _cameraController.ActivateDefaultCamera(Data.Vehicle.transform);
             _characterController.enabled = false;
             _characterAnimationController.SwitchToDrivingLayer();
             _characterAnimationController.ResetBodyOrientation();
-            _inputHandler.InteractPressed.AddListener(ExitVehicle);
-            _inputHandler.ChangeSeatPressed.AddListener(ChangeSeat);
-            _inputHandler.Enable();
+            _inputData.InteractPressed.AddListener(ExitVehicle);
+            _inputData.ChangeSeatPressed.AddListener(ChangeSeat);
 
-            Data.DriverSeat.SetInputData(_inputHandler.CarVehicleInputData);
+            Data.DriverSeat.SetInputData(_inputData.CarVehicleInputData);
         }
 
         public override void Exit()
         {
-            _inputHandler.InteractPressed.RemoveListener(ExitVehicle);
-            _inputHandler.ChangeSeatPressed.RemoveListener(ChangeSeat);
-            _inputHandler.Disable();
+            _inputData.InteractPressed.RemoveListener(ExitVehicle);
+            _inputData.ChangeSeatPressed.RemoveListener(ChangeSeat);
 
             Data.DriverSeat.SetInputData(null);
         }

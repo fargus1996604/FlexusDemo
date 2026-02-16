@@ -3,13 +3,22 @@ using System.Collections.Generic;
 using System.Linq;
 using GamePlay.Playable.Characters;
 using GamePlay.Vehicle.Car.Seats;
+using Unity.Netcode;
 using UnityEngine;
 
 namespace GamePlay.Vehicle.Car
 {
     [RequireComponent(typeof(CarController))]
-    public class CarVehicle : MonoBehaviour
+    public class CarVehicle : NetworkBehaviour
     {
+        [Serializable]
+        public class InputData
+        {
+            public float Throttle;
+            public float Steering;
+            public bool IsBraking;
+        }
+        
         private CarController _controller;
         protected CarController Controller => _controller ??= GetComponent<CarController>();
 
@@ -19,8 +28,21 @@ namespace GamePlay.Vehicle.Car
         [SerializeField]
         private List<Seat> _seats;
 
+        public override void OnNetworkSpawn()
+        {
+            if (HasAuthority == false)
+            {
+                Controller.Engine.VehicleRigidbody.isKinematic = true;
+                Controller.Engine.enabled = false;
+                Controller.enabled = false;
+            }
+        }
+
         private void Update()
         {
+            if(HasAuthority == false)
+                return;
+            
             if (_driverSeat.InputData != null)
             {
                 Controller.SetThrottle(_driverSeat.InputData.Throttle);
@@ -109,13 +131,5 @@ namespace GamePlay.Vehicle.Car
 
             return null;
         }
-    }
-
-    [Serializable]
-    public class CarVehicleInputData
-    {
-        public float Throttle;
-        public float Steering;
-        public bool IsBraking;
     }
 }

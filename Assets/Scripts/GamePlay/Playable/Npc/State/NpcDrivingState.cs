@@ -19,10 +19,10 @@ namespace GamePlay.Playable.Npc.State
     
         private CharacterController _characterController;
         private CharacterAnimationController _characterAnimationController;
-        private CarVehicleInputData _inputData;
+        private CarVehicle.InputData _inputData;
 
         public NpcDrivingState(IStateContext context,CharacterController characterController,
-            CharacterAnimationController characterAnimationController, CarVehicleInputData inputData) :
+            CharacterAnimationController characterAnimationController, CarVehicle.InputData inputData) :
             base(context)
         {
             _characterController = characterController;

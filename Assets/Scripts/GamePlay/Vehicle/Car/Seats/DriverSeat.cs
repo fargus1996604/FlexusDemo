@@ -5,10 +5,10 @@ namespace GamePlay.Vehicle.Car.Seats
 {
     public class DriverSeat : Seat
     {
-        private CarVehicleInputData _inputData;
-        public CarVehicleInputData InputData => _inputData;
+        private CarVehicle.InputData _inputData;
+        public CarVehicle.InputData InputData => _inputData;
 
-        public void SetInputData(CarVehicleInputData inputData)
+        public void SetInputData(CarVehicle.InputData inputData)
         {
             _inputData = inputData;
         }

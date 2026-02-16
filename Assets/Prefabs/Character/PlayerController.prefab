@@ -420,6 +420,9 @@ PrefabInstance:
       addedObject: {fileID: 6067596790868544829}
     - targetCorrespondingSourceObject: {fileID: 6074253081246397337, guid: c4dff2dfa99c2754c961ba4c8cbd74de, type: 3}
       insertIndex: -1
+      addedObject: {fileID: 8811986274228722726}
+    - targetCorrespondingSourceObject: {fileID: 6074253081246397337, guid: c4dff2dfa99c2754c961ba4c8cbd74de, type: 3}
+      insertIndex: -1
       addedObject: {fileID: 8669309139906577973}
     - targetCorrespondingSourceObject: {fileID: 6074253081246397337, guid: c4dff2dfa99c2754c961ba4c8cbd74de, type: 3}
       insertIndex: -1
@@ -427,6 +430,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 6074253081246397337, guid: c4dff2dfa99c2754c961ba4c8cbd74de, type: 3}
       insertIndex: -1
       addedObject: {fileID: 8177541873690053390}
+    - targetCorrespondingSourceObject: {fileID: 6074253081246397337, guid: c4dff2dfa99c2754c961ba4c8cbd74de, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 4085624978292508563}
   m_SourcePrefab: {fileID: 100100000, guid: c4dff2dfa99c2754c961ba4c8cbd74de, type: 3}
 --- !u!4 &3575340211989226509 stripped
 Transform:
@@ -461,7 +467,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  GlobalObjectIdHash: 1035933128
+  GlobalObjectIdHash: 1984532790
   InScenePlacedSourceGlobalObjectIdHash: 1035933128
   DeferredDespawnTick: 0
   Ownership: 1
@@ -487,6 +493,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   ShowTopMostFoldoutHeaderGroup: 1
+  OnStateBeginChange:
+    m_PersistentCalls:
+      m_Calls: []
   _data:
     Gravity: -9.81
     Velocity: {x: 0, y: 0, z: 0}
@@ -495,6 +504,32 @@ MonoBehaviour:
   _characterAnimationController: {fileID: 3797029994376466202}
   _networkPanel: {fileID: 378257973297593164}
   _playerNameLabel: {fileID: 7239667245285828124}
+  PlayerInput:
+    Axes: {x: 0, y: 0}
+    MoveDirection: {x: 0, y: 0, z: 0}
+    IsSprinting: 0
+  VehicleInput:
+    CarVehicleInputData:
+      Throttle: 0
+      Steering: 0
+      IsBraking: 0
+    FireEngaged: 0
+    CameraForward: {x: 0, y: 0, z: 0}
+  _playerNumber:
+    m_InternalValue: 0
+--- !u!114 &8811986274228722726
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5571897771675895499}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 89e8a7a11bbe176408c2bad3f4420ba8, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  ShowTopMostFoldoutHeaderGroup: 1
 --- !u!114 &8669309139906577973
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -540,7 +575,7 @@ MonoBehaviour:
   RotationMaxInterpolationTime: 0.1
   ScaleLerpSmoothing: 1
   ScaleMaxInterpolationTime: 0.1
-  AuthorityMode: 1
+  AuthorityMode: 0
   TickSyncChildren: 0
   UseUnreliableDeltas: 0
   SyncPositionX: 1
@@ -549,9 +584,9 @@ MonoBehaviour:
   SyncRotAngleX: 1
   SyncRotAngleY: 1
   SyncRotAngleZ: 1
-  SyncScaleX: 1
-  SyncScaleY: 1
-  SyncScaleZ: 1
+  SyncScaleX: 0
+  SyncScaleY: 0
+  SyncScaleZ: 0
   PositionThreshold: 0.001
   RotAngleThreshold: 0.01
   ScaleThreshold: 0.01
@@ -576,7 +611,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   ShowTopMostFoldoutHeaderGroup: 1
   NetworkAnimatorExpanded: 0
-  AuthorityMode: 1
+  AuthorityMode: 0
   m_Animator: {fileID: 6436402467927473534}
   TransitionStateInfoList: []
   AnimatorParameterEntries:
@@ -598,6 +633,19 @@ MonoBehaviour:
       Synchronize: 1
       ParameterType: 1
   AnimatorParametersExpanded: 0
+--- !u!114 &4085624978292508563
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5571897771675895499}
+  m_Enabled: 0
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 722ad17f264e6ad46950bbf406b0551c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  ShowTopMostFoldoutHeaderGroup: 1
 --- !u!95 &6436402467927473534 stripped
 Animator:
   m_CorrespondingSourceObject: {fileID: 4633639483886569516, guid: c4dff2dfa99c2754c961ba4c8cbd74de, type: 3}

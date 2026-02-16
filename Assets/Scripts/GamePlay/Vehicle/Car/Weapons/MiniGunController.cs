@@ -1,28 +1,23 @@
+using System;
 using Gameplay.Core;
+using Unity.Netcode;
 using UnityEngine;
 
 namespace GamePlay.Vehicle.Car.Weapons
 {
-    public class MiniGunController : MonoBehaviour, ITickable
+    public class MiniGunController : NetworkBehaviour
     {
-        public class InputData
-        {
-            public Vector3 LookDirection;
-            public bool Fire;
-        }
+        public MiniGunInputData InputData = new();
+        
+        [SerializeField]
+        private NetworkObject _leftHandTarget;
 
-        private InputData _data;
-        public InputData Data => _data;
+        public NetworkObject LeftHandTarget => _leftHandTarget;
 
         [SerializeField]
-        private Transform _leftHandTarget;
+        private NetworkObject _rightHandTarget;
 
-        public Transform LeftHandTarget => _leftHandTarget;
-
-        [SerializeField]
-        private Transform _rightHandTarget;
-
-        public Transform RightHandTarget => _rightHandTarget;
+        public NetworkObject RightHandTarget => _rightHandTarget;
 
         [SerializeField]
         private ParticleSystem _muzzleFlashParticle;
@@ -43,6 +38,9 @@ namespace GamePlay.Vehicle.Car.Weapons
         private float _decreaseSpeed;
 
         [SerializeField]
+        private float _lookSmooth;
+
+        [SerializeField]
         private float _currentRpm;
 
         [SerializeField]
@@ -51,10 +49,7 @@ namespace GamePlay.Vehicle.Car.Weapons
         public bool CanFire => _currentRpm >= _maxRpm;
         public float Charge => _currentRpm / _maxRpm;
 
-        public void SetInputData(InputData inputData)
-        {
-            _data = inputData;
-        }
+        private NetworkVariable<bool> _activated = new NetworkVariable<bool>();
 
         public void ResetGun()
         {
@@ -63,25 +58,31 @@ namespace GamePlay.Vehicle.Car.Weapons
             _sound.StopAllSounds();
         }
 
-        public void Tick(float deltaTime)
+        private void Update()
         {
-            _gunMesh.transform.forward = _data.LookDirection;
-            _currentRpm += (_data.Fire ? _power : -_decreaseSpeed) * deltaTime;
+            if (_activated.Value == false)
+                return;
+
+            _gunMesh.transform.forward = Vector3.Lerp(_gunMesh.transform.forward, InputData.LookDirection,
+                Time.deltaTime * _lookSmooth);
+            _currentRpm += (InputData.Fire ? _power : -_decreaseSpeed) * Time.deltaTime;
             _currentRpm = Mathf.Clamp(_currentRpm, 0, _maxRpm);
-            _barrel.localRotation *= Quaternion.Euler(0, 0, _currentRpm * deltaTime);
+            _barrel.localRotation *= Quaternion.Euler(0, 0, _currentRpm * Time.deltaTime);
 
             if (CanFire)
             {
-                if (Physics.Raycast(_gunMesh.position, _gunMesh.forward, out RaycastHit hit, 30))
+                if (IsServer)
                 {
-                    if (hit.rigidbody != null)
+                    if (Physics.Raycast(_gunMesh.position, _gunMesh.forward, out RaycastHit hit, 30))
                     {
-                        Vector3 force = (hit.transform.position - hit.point).normalized * 300;
-                        hit.rigidbody.AddForce(force, ForceMode.Impulse);
+                        if (hit.rigidbody != null)
+                        {
+                            Vector3 force = (hit.transform.position - hit.point).normalized * 300;
+                            hit.rigidbody.AddForce(force, ForceMode.Impulse);
+                        }
                     }
                 }
-                
-                
+
                 if (_muzzleFlashParticle.isPlaying == false)
                 {
                     _muzzleFlashParticle.Play();
@@ -95,7 +96,48 @@ namespace GamePlay.Vehicle.Car.Weapons
                 }
             }
 
-            _sound.Tick(deltaTime, this);
+            _sound.Tick(Time.deltaTime, this);
+        }
+
+        public void Activate()
+        {
+            _activated.Value = true;
+            _activated.SetDirty(true);
+        }
+
+        public void Deactivate()
+        {
+            _activated.Value = false;
+            _activated.SetDirty(true);
+        }
+    }
+
+    [System.Serializable]
+    public class MiniGunInputData : NetworkVariableBase
+    {
+        public Vector3 LookDirection;
+        public bool Fire;
+
+        public override void WriteField(FastBufferWriter writer)
+        {
+            writer.WriteValueSafe(LookDirection);
+            writer.WriteValueSafe(Fire);
+        }
+
+        public override void ReadField(FastBufferReader reader)
+        {
+            reader.ReadValueSafe(out LookDirection);
+            reader.ReadValueSafe(out Fire);
+        }
+
+        public override void WriteDelta(FastBufferWriter writer)
+        {
+            WriteField(writer);
+        }
+
+        public override void ReadDelta(FastBufferReader reader, bool keepDirtyDelta)
+        {
+            ReadField(reader);
         }
     }
 }
