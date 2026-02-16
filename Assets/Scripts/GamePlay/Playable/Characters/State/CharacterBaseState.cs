@@ -1,6 +1,5 @@
 using Gameplay.Core.StateMachine;
 using Gameplay.Core.StateMachine.Interfaces;
-using GamePlay.Input.InputHandler;
 using GamePlay.Playable.Characters.Animation;
 using GamePlay.Vehicle.Car;
 using UnityEngine;
@@ -12,21 +11,16 @@ namespace GamePlay.Playable.Characters.State
         private BaseCharacterController.PlayerData _data;
         private CharacterController _characterController;
         private CharacterAnimationController _characterAnimationController;
-        private PlayerInputHandler _inputHandler;
-        private CameraController _cameraController;
-        private Camera _camera;
+        private PlayerInputData _inputHandlerData;
 
         public CharacterBaseState(IStateContext context, BaseCharacterController.PlayerData data,
             CharacterController characterController, CharacterAnimationController characterAnimationController,
-            PlayerInputHandler inputHandler,CameraController cameraController,
-            Camera camera) : base(context)
+            PlayerInputData inputHandlerData) : base(context)
         {
             _data = data;
             _characterController = characterController;
             _characterAnimationController = characterAnimationController;
-            _inputHandler = inputHandler;
-            _cameraController = cameraController;
-            _camera = camera;
+            _inputHandlerData = inputHandlerData;
         }
 
         public override void Tick(float deltaTime)
@@ -39,9 +33,9 @@ namespace GamePlay.Playable.Characters.State
             _data.Velocity.y += _data.Gravity * Time.deltaTime;
             _characterController.Move(_characterAnimationController.DeltaPosition + (_data.Velocity * deltaTime));
 
-            var cameraLook = _camera.transform.forward;
+            var cameraLook = _inputHandlerData.MoveDirection;
 
-            if (_inputHandler.Move != Vector2.zero)
+            if (_inputHandlerData.Axes != Vector2.zero)
             {
                 var lookRotation = Quaternion.LookRotation(cameraLook);
                 lookRotation.x = 0;
@@ -50,23 +44,20 @@ namespace GamePlay.Playable.Characters.State
                     _characterAnimationController.MovingInterpolation * Time.deltaTime);
             }
             
-            _characterAnimationController.Move(_inputHandler.Move, cameraLook);
-            _characterAnimationController.SetDash(_inputHandler.IsSprinting);
+            _characterAnimationController.Move(_inputHandlerData.Axes, cameraLook);
+            _characterAnimationController.SetDash(_inputHandlerData.IsSprinting);
         }
 
         public override void Enter()
         {
-            _cameraController.ActivateDefaultCamera(_characterController.transform);
             _characterController.enabled = true;
             _characterAnimationController.SwitchToBaseLayer();
-            _inputHandler.InteractPressed.AddListener(FindClosestVehicles);
-            _inputHandler.Enable();
+            _inputHandlerData.InteractPressed.AddListener(FindClosestVehicles);
         }
 
         public override void Exit()
         {
-            _inputHandler.InteractPressed.RemoveListener(FindClosestVehicles);
-            _inputHandler.Disable();
+            _inputHandlerData.InteractPressed.RemoveListener(FindClosestVehicles);
         }
         
         private void FindClosestVehicles()

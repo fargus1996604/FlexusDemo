@@ -1,7 +1,6 @@
 using Gameplay.Core.StateMachine;
 using Gameplay.Core.StateMachine.Interfaces;
 using GamePlay.Input;
-using GamePlay.Input.InputHandler;
 using GamePlay.Playable.Characters.Animation;
 using GamePlay.Vehicle.Car;
 using GamePlay.Vehicle.Car.Seats;
@@ -20,16 +19,16 @@ namespace GamePlay.Playable.Characters.State
         private BaseCharacterController _baseCharacterController;
         private CharacterController _characterController;
         private CharacterAnimationController _characterAnimationController;
-        private VehicleInputHandler _inputHandler;
+        private VehicleInputData _inputData;
 
         public CharacterSeatParamState(BaseCharacterController context, CharacterController characterController,
-            CharacterAnimationController characterAnimationController, VehicleInputHandler inputHandler) :
+            CharacterAnimationController characterAnimationController, VehicleInputData inputData) :
             base(context)
         {
             _baseCharacterController = context;
             _characterController = characterController;
             _characterAnimationController = characterAnimationController;
-            _inputHandler = inputHandler;
+            _inputData = inputData;
         }
 
         public override void Enter()
@@ -38,16 +37,14 @@ namespace GamePlay.Playable.Characters.State
             _characterAnimationController.SwitchToSeatLayer();
             _characterAnimationController.ResetBodyOrientation();
 
-            _inputHandler.InteractPressed.AddListener(ExitVehicle);
-            _inputHandler.ChangeSeatPressed.AddListener(ChangeSeat);
-            _inputHandler.Enable();
+            _inputData.InteractPressed.AddListener(ExitVehicle);
+            _inputData.ChangeSeatPressed.AddListener(ChangeSeat);
         }
 
         public override void Exit()
         {
-            _inputHandler.InteractPressed.RemoveListener(ExitVehicle);
-            _inputHandler.ChangeSeatPressed.RemoveListener(ChangeSeat);
-            _inputHandler.Disable();
+            _inputData.InteractPressed.RemoveListener(ExitVehicle);
+            _inputData.ChangeSeatPressed.RemoveListener(ChangeSeat);
         }
 
         private void ChangeSeat()

@@ -1,6 +1,4 @@
 using Gameplay.Core.StateMachine;
-using Gameplay.Core.StateMachine.Interfaces;
-using GamePlay.Input.InputHandler;
 using GamePlay.Playable.Characters.Animation;
 using GamePlay.Vehicle.Car;
 using GamePlay.Vehicle.Car.Seats;
@@ -21,55 +19,46 @@ namespace GamePlay.Playable.Characters.State
         private BaseCharacterController _baseCharacterController;
         private CharacterController _characterController;
         private CharacterAnimationController _characterAnimationController;
-        private VehicleInputHandler _inputHandler;
-        private CameraController _cameraController;
-
-        private MiniGunController.InputData _inputData;
+        private VehicleInputData _inputData;
         
         public CharacterSeatMiniGunParamState(BaseCharacterController context, CharacterController characterController,
-            CharacterAnimationController characterAnimationController, VehicleInputHandler inputHandler,
-            CameraController cameraController) : base(context)
+            CharacterAnimationController characterAnimationController, VehicleInputData inputData) : base(context)
         {
             _baseCharacterController = context;
             _characterController = characterController;
             _characterAnimationController = characterAnimationController;
-            _inputHandler = inputHandler;
-            _cameraController = cameraController;
+            _inputData = inputData;
         }
 
         public override void Tick(float deltaTime)
         {
-            _inputData.Fire = _inputHandler.FireEngaged;
-            _inputData.LookDirection = Camera.main.transform.forward;
-            Data.MiniGunController.Tick(deltaTime);
+            Data.MiniGunController.InputData.Fire = _inputData.FireEngaged;
+            Data.MiniGunController.InputData.LookDirection = _inputData.CameraForward;
+            Data.MiniGunController.InputData.SetDirty(true);
         }
 
         public override void Enter()
         {
-            _inputData = new MiniGunController.InputData();
-            _cameraController.ActivateMiniGunCamera(Data.MiniGunController.transform);
             _characterController.enabled = false;
             
             _characterAnimationController.SwitchToMiniGunLayer();
             _characterAnimationController.ResetBodyOrientation();
-            _characterAnimationController.SetLeftHandIKTarget(Data.MiniGunController.LeftHandTarget);
-            _characterAnimationController.SetRightHandIKTarget(Data.MiniGunController.RightHandTarget);
+            _characterAnimationController.SetMiniGunIKTargetsRpc(Data.MiniGunController);
             
-            _inputHandler.InteractPressed.AddListener(ExitVehicle);
-            _inputHandler.ChangeSeatPressed.AddListener(ChangeSeat);
-            _inputHandler.Enable();
+            _inputData.InteractPressed.AddListener(ExitVehicle);
+            _inputData.ChangeSeatPressed.AddListener(ChangeSeat);
             
-            Data.MiniGunController.SetInputData(_inputData);
             Data.MiniGunController.ResetGun();
+            Data.MiniGunController.Activate();
         }
 
         public override void Exit()
         {
-            _characterAnimationController.ResetAllIkTargets();
-            _inputHandler.InteractPressed.RemoveListener(ExitVehicle);
-            _inputHandler.ChangeSeatPressed.RemoveListener(ChangeSeat);
-            _inputHandler.Disable();
+            _characterAnimationController.ResetAllIkTargetsRpc();
+            _inputData.InteractPressed.RemoveListener(ExitVehicle);
+            _inputData.ChangeSeatPressed.RemoveListener(ChangeSeat);
             Data.MiniGunController.ResetGun();
+            Data.MiniGunController.Deactivate();
         }
 
         private void ChangeSeat()

@@ -6,7 +6,7 @@ namespace GamePlay.Vehicle.Car
     public class CarController : MonoBehaviour
     {
         private CarEngine _engine;
-        protected CarEngine Engine => _engine ??= GetComponent<CarEngine>();
+        public CarEngine Engine => _engine ??= GetComponent<CarEngine>();
 
         [SerializeField]
         private float _maxSteeringAngle;
