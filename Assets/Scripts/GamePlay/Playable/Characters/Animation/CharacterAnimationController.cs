@@ -1,19 +1,22 @@
 using System;
+using GamePlay.Vehicle.Car.Weapons;
+using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.Events;
 
 namespace GamePlay.Playable.Characters.Animation
 {
     [RequireComponent(typeof(Animator))]
-    public class CharacterAnimationController : MonoBehaviour
+    public class CharacterAnimationController : NetworkBehaviour
     {
         private Animator _characterAnimator;
         protected Animator CharacterAnimator => _characterAnimator ??= GetComponent<Animator>();
 
         public UnityEvent OnFootStep;
-        
+
         [SerializeField]
         private float _movingInterpolation = 1f;
+
         public float MovingInterpolation => _movingInterpolation;
 
         [SerializeField]
@@ -31,7 +34,7 @@ namespace GamePlay.Playable.Characters.Animation
         private readonly string DRIVING_LAYER_NAME = "Driving Layer";
         private readonly string SEAT_LAYER_NAME = "Seat Layer";
         private readonly string MINIGUN_LAYER_NAME = "MiniGun Layer";
-        
+
 
         private Vector2 _moveDirection = Vector2.zero;
         private Transform _leftHandIkTarget;
@@ -42,7 +45,7 @@ namespace GamePlay.Playable.Characters.Animation
             _moveDirection = Vector2.Lerp(_moveDirection, direction, _movingInterpolation * Time.deltaTime);
             CharacterAnimator.SetFloat(MOVE_X_FLOAT_KEY, _moveDirection.x);
             CharacterAnimator.SetFloat(MOVE_Y_FLOAT_KEY, _moveDirection.y);
-            
+
             if (direction != Vector2.zero)
             {
                 if (Mathf.Abs(_moveDirection.y) > 0.9f)
@@ -51,12 +54,12 @@ namespace GamePlay.Playable.Characters.Animation
                 }
             }
         }
-        
+
         public void SetDash(bool dash)
         {
             CharacterAnimator.SetBool(DASH_BOOLEAN_KEY, dash);
         }
-        
+
         public void SwitchToBaseLayer()
         {
             CharacterAnimator.SetLayerWeight(CharacterAnimator.GetLayerIndex(BASE_LAYER_NAME), 1);
@@ -72,7 +75,7 @@ namespace GamePlay.Playable.Characters.Animation
             CharacterAnimator.SetLayerWeight(CharacterAnimator.GetLayerIndex(SEAT_LAYER_NAME), 0);
             CharacterAnimator.SetLayerWeight(CharacterAnimator.GetLayerIndex(MINIGUN_LAYER_NAME), 0);
         }
-        
+
         public void SwitchToSeatLayer()
         {
             CharacterAnimator.SetLayerWeight(CharacterAnimator.GetLayerIndex(BASE_LAYER_NAME), 0);
@@ -80,7 +83,7 @@ namespace GamePlay.Playable.Characters.Animation
             CharacterAnimator.SetLayerWeight(CharacterAnimator.GetLayerIndex(SEAT_LAYER_NAME), 1);
             CharacterAnimator.SetLayerWeight(CharacterAnimator.GetLayerIndex(MINIGUN_LAYER_NAME), 0);
         }
-        
+
         public void SwitchToMiniGunLayer()
         {
             CharacterAnimator.SetLayerWeight(CharacterAnimator.GetLayerIndex(BASE_LAYER_NAME), 0);
@@ -88,27 +91,43 @@ namespace GamePlay.Playable.Characters.Animation
             CharacterAnimator.SetLayerWeight(CharacterAnimator.GetLayerIndex(SEAT_LAYER_NAME), 0);
             CharacterAnimator.SetLayerWeight(CharacterAnimator.GetLayerIndex(MINIGUN_LAYER_NAME), 1);
         }
-        
+
         public void ResetBodyOrientation()
         {
             transform.localRotation = Quaternion.identity;
         }
 
-        public void SetLeftHandIKTarget(Transform leftHandIKTarget)
+        [Rpc(SendTo.Owner)]
+        public void SetLeftHandIKTargetRpc(NetworkObjectReference networkObjectReference)
         {
-            _leftHandIkTarget = leftHandIKTarget;
+            if (networkObjectReference.TryGet(out NetworkObject networkObject) == false)
+                return;
+            _leftHandIkTarget = networkObject.transform;
         }
 
-        public void SetRightHandIKTarget(Transform rightHandIKTarget)
+        [Rpc(SendTo.Owner)]
+        public void SetRightHandIKTargetRpc(NetworkObjectReference networkObjectReference)
         {
-            _rightHandIkTarget = rightHandIKTarget;
+            if (networkObjectReference.TryGet(out NetworkObject networkObject) == false)
+                return;
+            _rightHandIkTarget = networkObject.transform;
         }
 
-        public void ResetAllIkTargets()
+        [Rpc(SendTo.Everyone)]
+        public void SetMiniGunIKTargetsRpc(NetworkBehaviourReference networkBehaviourReference)
+        {
+            if(networkBehaviourReference.TryGet(out MiniGunController miniGunController) == false)
+                return;
+            _leftHandIkTarget = miniGunController.LeftHandTarget.transform;
+            _rightHandIkTarget = miniGunController.RightHandTarget.transform;
+        }
+        
+        [Rpc(SendTo.Everyone)]
+        public void ResetAllIkTargetsRpc()
         {
             _leftHandIkTarget = null;
             _rightHandIkTarget = null;
-            
+
             CharacterAnimator.SetIKPositionWeight(AvatarIKGoal.LeftHand, 0);
             CharacterAnimator.SetIKPositionWeight(AvatarIKGoal.RightHand, 0);
         }
@@ -117,7 +136,7 @@ namespace GamePlay.Playable.Characters.Animation
         {
             OnFootStep?.Invoke();
         }
-        
+
         private void OnAnimatorMove()
         {
             _deltaPosition = CharacterAnimator.deltaPosition;

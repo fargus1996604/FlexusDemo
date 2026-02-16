@@ -37,6 +37,7 @@ Transform:
   - {fileID: 5134833294153061375}
   - {fileID: 4543695270178425681}
   - {fileID: 39333519045070402}
+  - {fileID: 3616462002089059889}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 180, z: 0}
 --- !u!114 &612681264600559843
@@ -67,14 +68,20 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c98fb4aceadfaad41b7d1bd6cab6fd54, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _leftHandTarget: {fileID: 84212121938601202}
-  _rightHandTarget: {fileID: 7134717016343323580}
+  ShowTopMostFoldoutHeaderGroup: 1
+  InputData:
+    LookDirection: {x: 0, y: 0, z: 0}
+    Fire: 0
+  _networkObject: {fileID: 0}
+  _leftHandTarget: {fileID: 9180561406036056509}
+  _rightHandTarget: {fileID: 6520866324372921627}
   _muzzleFlashParticle: {fileID: 7193583000314949827}
   _gunMesh: {fileID: 4632352525977090661}
   _barrel: {fileID: 8406288374880008669}
   _maxRpm: 1500
   _power: 1100
   _decreaseSpeed: 500
+  _lookSmooth: 20
   _currentRpm: 0
   _sound: {fileID: 3268868792736623331}
 --- !u!114 &3268868792736623331
@@ -391,6 +398,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 7134717016343323580}
+  - component: {fileID: 6520866324372921627}
   m_Layer: 0
   m_Name: RightHandTarget
   m_TagString: Untagged
@@ -413,6 +421,31 @@ Transform:
   m_Children: []
   m_Father: {fileID: 4723456074171447684}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &6520866324372921627
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5616842234093030273}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  GlobalObjectIdHash: 0
+  InScenePlacedSourceGlobalObjectIdHash: 0
+  DeferredDespawnTick: 0
+  Ownership: 1
+  AlwaysReplicateAsRoot: 0
+  SynchronizeTransform: 0
+  ActiveSceneSynchronization: 0
+  SceneMigrationSynchronization: 0
+  SpawnWithObservers: 0
+  DontDestroyWithOwner: 0
+  AutoObjectParentSync: 0
+  SyncOwnerTransformWhenParented: 0
+  AllowOwnerToParent: 0
 --- !u!1 &5658803118059148942
 GameObject:
   m_ObjectHideFlags: 0
@@ -551,6 +584,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 84212121938601202}
+  - component: {fileID: 9180561406036056509}
   m_Layer: 0
   m_Name: LeftHandTarget
   m_TagString: Untagged
@@ -573,6 +607,62 @@ Transform:
   m_Children: []
   m_Father: {fileID: 4723456074171447684}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &9180561406036056509
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6805474628494620734}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  GlobalObjectIdHash: 0
+  InScenePlacedSourceGlobalObjectIdHash: 0
+  DeferredDespawnTick: 0
+  Ownership: 1
+  AlwaysReplicateAsRoot: 0
+  SynchronizeTransform: 0
+  ActiveSceneSynchronization: 0
+  SceneMigrationSynchronization: 0
+  SpawnWithObservers: 0
+  DontDestroyWithOwner: 0
+  AutoObjectParentSync: 0
+  SyncOwnerTransformWhenParented: 0
+  AllowOwnerToParent: 0
+--- !u!1 &7979903147709231842
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 3616462002089059889}
+  m_Layer: 0
+  m_Name: CameraPivot
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &3616462002089059889
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7979903147709231842}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1682369961269998044}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &8679749283987377648
 GameObject:
   m_ObjectHideFlags: 0
@@ -582,6 +672,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 5735793154166165059}
+  - component: {fileID: 2586268575562144037}
   m_Layer: 0
   m_Name: SeatPivot
   m_TagString: Untagged
@@ -604,6 +695,31 @@ Transform:
   m_Children: []
   m_Father: {fileID: 1682369961269998044}
   m_LocalEulerAnglesHint: {x: 0, y: 90, z: 0}
+--- !u!114 &2586268575562144037
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8679749283987377648}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  GlobalObjectIdHash: 2613611732
+  InScenePlacedSourceGlobalObjectIdHash: 0
+  DeferredDespawnTick: 0
+  Ownership: 1
+  AlwaysReplicateAsRoot: 0
+  SynchronizeTransform: 1
+  ActiveSceneSynchronization: 0
+  SceneMigrationSynchronization: 0
+  SpawnWithObservers: 0
+  DontDestroyWithOwner: 0
+  AutoObjectParentSync: 1
+  SyncOwnerTransformWhenParented: 1
+  AllowOwnerToParent: 0
 --- !u!1001 &5046194577503624815
 PrefabInstance:
   m_ObjectHideFlags: 0

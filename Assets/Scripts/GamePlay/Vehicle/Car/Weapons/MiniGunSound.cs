@@ -17,11 +17,11 @@ namespace GamePlay.Vehicle.Car.Weapons
 
         public void Tick(float deltaTime, MiniGunController controller)
         {
-            if (controller.Data.Fire && controller.CanFire == false && _startSource.isPlaying == false)
+            if (controller.InputData.Fire && controller.CanFire == false && _startSource.isPlaying == false)
             {
                 _startSource.Play();
             }
-            else if (controller.Data.Fire == false && _endSource.isPlaying == false && controller.Charge > 0.001f)
+            else if (controller.InputData.Fire == false && _endSource.isPlaying == false && controller.Charge > 0.001f)
             {
                 _endSource.time = Mathf.Lerp(0, _endSource.clip.length,  Mathf.Clamp01(1 - controller.Charge));
                 _endSource.Play();
