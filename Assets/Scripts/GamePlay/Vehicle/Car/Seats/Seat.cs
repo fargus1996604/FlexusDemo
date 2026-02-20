@@ -1,22 +1,28 @@
 using GamePlay.Playable;
 using GamePlay.Playable.Characters;
+using Unity.Netcode;
+using Unity.Netcode.Components;
 using UnityEngine;
 
 namespace GamePlay.Vehicle.Car.Seats
 {
-    public class Seat : MonoBehaviour
+    public class Seat : NetworkBehaviour
     {
         [SerializeField]
         private Transform _pivot;
+        public Transform Pivot => _pivot;
 
         [SerializeField]
         private Transform _doorPlayerPivot;
 
         [SerializeField]
+        private NetworkObject _parentNetworkObject;
+
+        [SerializeField]
         private BaseCharacterController _player;
 
         public BaseCharacterController Player => _player;
-        
+
         public bool HasFree => _player == null;
 
         public bool TryAttach(BaseCharacterController player)
@@ -24,21 +30,30 @@ namespace GamePlay.Vehicle.Car.Seats
             if (HasFree == false)
                 return false;
 
-            player.transform.SetParent(_pivot);
-            player.transform.localPosition = Vector3.zero;
-            player.transform.localRotation = Quaternion.identity;
-            _player = player;
-            return true;
+            if (player.NetworkObject.TrySetParent(_parentNetworkObject))
+            {
+                player.transform.localPosition = _pivot.localPosition;
+                player.transform.localRotation = _pivot.localRotation;
+                _player = player;
+                return true;
+            }
+
+            return false;
         }
 
-        public void Detach()
+        public bool TryDetach()
         {
             if (HasFree)
-                return;
+                return false;
 
-            _player.transform.SetParent(null);
-            _player.transform.position = _doorPlayerPivot.position;
-            _player = null;
+            if (_player.NetworkObject.TryRemoveParent())
+            {
+                _player.transform.position = _doorPlayerPivot.position;
+                _player = null;
+                return true;
+            }
+
+            return false;
         }
 
         public bool TransferTo(Seat seat)

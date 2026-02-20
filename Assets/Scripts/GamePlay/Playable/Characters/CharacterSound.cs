@@ -16,8 +16,10 @@ namespace GamePlay.Playable.Characters
         [SerializeField]
         private AudioClip[] _stepsClips;
 
+        
+        private Vector3 _lastPosition;
+        private float _magnitude;
         private int _stepIndex;
-
         private float _lastStepTime;
         
         private void Start()
@@ -25,13 +27,18 @@ namespace GamePlay.Playable.Characters
             _characterAnimationController.OnFootStep.AddListener(OnFootStep);
         }
 
+        private void Update()
+        {
+            _magnitude = Vector3.Distance(_lastPosition, transform.position);
+            _lastPosition = transform.position;
+        }
+
         private void OnFootStep()
         {
-            float movingMagnitude = _characterAnimationController.DeltaPosition.magnitude;
-            if(movingMagnitude < 0.001f)
+            if(_magnitude < 0.001f)
                 return;
             
-            _audioSource.volume = movingMagnitude < 0.02f ? 0.3f : 1f;
+            _audioSource.volume = _magnitude < 0.02f ? 0.3f : 1f;
             
             if(Time.time - _lastStepTime < 0.1f)
                 return;

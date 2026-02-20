@@ -3,25 +3,48 @@ using GamePlay.Playable.Characters.Animation;
 using GamePlay.Vehicle.Car;
 using GamePlay.Vehicle.Car.Seats;
 using GamePlay.Vehicle.Car.Weapons;
+using Unity.Netcode;
 using UnityEngine;
 
-namespace GamePlay.Playable.Characters.State
+namespace GamePlay.Playable.Characters.State.Server
 {
-    public class CharacterSeatMiniGunParamState : TickableParamBaseState<CharacterSeatMiniGunParamState.OutData>
+    public class ServerSeatMiniGunParamState : ParamBaseState<ServerSeatMiniGunParamState.SeatData>
     {
-        public class OutData
+        public struct SeatData : IStateNetworkData
         {
             public CarVehicle Vehicle;
             public MiniGunSeat MiniGunSeat;
             public MiniGunController MiniGunController;
+            
+            public void Boxing(NetworkBehaviourReference[] references)
+            {
+                references[0].TryGet(out Vehicle);
+                references[1].TryGet(out MiniGunSeat);
+                references[2].TryGet(out MiniGunController);
+            }
+
+            public NetworkBehaviourReference[] Unboxing()
+            {
+                return new NetworkBehaviourReference[]
+                {
+                    Vehicle,
+                    MiniGunSeat,
+                    MiniGunController
+                };
+            }
+
+            public bool IsValid()
+            {
+                return Vehicle != null && MiniGunSeat != null && MiniGunController != null;
+            }
         }
 
         private BaseCharacterController _baseCharacterController;
         private CharacterController _characterController;
         private CharacterAnimationController _characterAnimationController;
         private VehicleInputData _inputData;
-        
-        public CharacterSeatMiniGunParamState(BaseCharacterController context, CharacterController characterController,
+
+        public ServerSeatMiniGunParamState(BaseCharacterController context, CharacterController characterController,
             CharacterAnimationController characterAnimationController, VehicleInputData inputData) : base(context)
         {
             _baseCharacterController = context;
@@ -30,25 +53,14 @@ namespace GamePlay.Playable.Characters.State
             _inputData = inputData;
         }
 
-        public override void Tick(float deltaTime)
-        {
-            Data.MiniGunController.InputData.Fire = _inputData.FireEngaged;
-            Data.MiniGunController.InputData.LookDirection = _inputData.CameraForward;
-            Data.MiniGunController.InputData.SetDirty(true);
-        }
-
         public override void Enter()
         {
             _characterController.enabled = false;
-            
             _characterAnimationController.SwitchToMiniGunLayer();
             _characterAnimationController.ResetBodyOrientation();
             _characterAnimationController.SetMiniGunIKTargetsRpc(Data.MiniGunController);
-            
             _inputData.InteractPressed.AddListener(ExitVehicle);
             _inputData.ChangeSeatPressed.AddListener(ChangeSeat);
-            
-            Data.MiniGunController.ResetGun();
             Data.MiniGunController.Activate();
         }
 
@@ -57,7 +69,6 @@ namespace GamePlay.Playable.Characters.State
             _characterAnimationController.ResetAllIkTargetsRpc();
             _inputData.InteractPressed.RemoveListener(ExitVehicle);
             _inputData.ChangeSeatPressed.RemoveListener(ChangeSeat);
-            Data.MiniGunController.ResetGun();
             Data.MiniGunController.Deactivate();
         }
 

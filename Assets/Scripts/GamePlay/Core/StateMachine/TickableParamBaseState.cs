@@ -1,4 +1,5 @@
 using Gameplay.Core.StateMachine.Interfaces;
+using GamePlay.Playable;
 using UnityEngine;
 
 namespace Gameplay.Core.StateMachine

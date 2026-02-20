@@ -1,9 +1,10 @@
 using Gameplay.Core.StateMachine;
 using Gameplay.Core.StateMachine.Interfaces;
+using GamePlay.Playable.Characters.State.Client;
 using GamePlay.Vehicle.Car;
 using GamePlay.Vehicle.Car.Seats;
 
-namespace GamePlay.Playable.Characters.State
+namespace GamePlay.Playable.Characters.State.Server
 {
     public class CharacterChangeSeatParamState : ParamBaseState<CharacterChangeSeatParamState.VehicleData>
     {
@@ -32,15 +33,15 @@ namespace GamePlay.Playable.Characters.State
             }
             else if (Data.Seat is MiniGunSeat miniGunSeat)
             {
-                var data = new CharacterSeatMiniGunParamState.OutData()
+                var data = new ServerSeatMiniGunParamState.SeatData()
                 {
                     Vehicle = Data.Vehicle,
                     MiniGunSeat = miniGunSeat,
                     MiniGunController = miniGunSeat.Controller
                 };
                 Context
-                    .SwitchStateWithData<CharacterSeatMiniGunParamState,
-                        CharacterSeatMiniGunParamState.OutData>(data);
+                    .SwitchStateWithData<ServerSeatMiniGunParamState,
+                        ServerSeatMiniGunParamState.SeatData>(data);
             }
             else
             {

@@ -91,16 +91,17 @@ namespace GamePlay.Vehicle.Car
             return nextSeat;
         }
 
-        public void ExitCar(BaseCharacterController player)
+        public bool TryExitCar(BaseCharacterController player)
         {
             foreach (var seat in _seats)
             {
                 if (seat.Player == player)
                 {
-                    seat.Detach();
-                    return;
+                    return seat.TryDetach();;
                 }
             }
+
+            return false;
         }
 
         private Seat GetNextFreeSeat(Seat currentSeat)

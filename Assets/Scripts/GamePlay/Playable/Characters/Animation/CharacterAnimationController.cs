@@ -22,9 +22,6 @@ namespace GamePlay.Playable.Characters.Animation
         [SerializeField]
         private Transform _bodyOrientationPivot;
 
-        private Vector3 _deltaPosition;
-        public Vector3 DeltaPosition => _deltaPosition;
-
         private readonly int MOVE_X_FLOAT_KEY = Animator.StringToHash("MoveX");
         private readonly int MOVE_Y_FLOAT_KEY = Animator.StringToHash("MoveY");
         private readonly int DASH_BOOLEAN_KEY = Animator.StringToHash("Dash");
@@ -35,14 +32,13 @@ namespace GamePlay.Playable.Characters.Animation
         private readonly string SEAT_LAYER_NAME = "Seat Layer";
         private readonly string MINIGUN_LAYER_NAME = "MiniGun Layer";
 
-
         private Vector2 _moveDirection = Vector2.zero;
         private Transform _leftHandIkTarget;
         private Transform _rightHandIkTarget;
 
-        public void Move(Vector2 direction, Vector3 cameraForward)
+        public void Move(Vector2 direction, Vector3 cameraForward, float deltaTime)
         {
-            _moveDirection = Vector2.Lerp(_moveDirection, direction, _movingInterpolation * Time.deltaTime);
+            _moveDirection = Vector2.Lerp(_moveDirection, direction, _movingInterpolation * deltaTime);
             CharacterAnimator.SetFloat(MOVE_X_FLOAT_KEY, _moveDirection.x);
             CharacterAnimator.SetFloat(MOVE_Y_FLOAT_KEY, _moveDirection.y);
 
@@ -116,12 +112,12 @@ namespace GamePlay.Playable.Characters.Animation
         [Rpc(SendTo.Everyone)]
         public void SetMiniGunIKTargetsRpc(NetworkBehaviourReference networkBehaviourReference)
         {
-            if(networkBehaviourReference.TryGet(out MiniGunController miniGunController) == false)
+            if (networkBehaviourReference.TryGet(out MiniGunController miniGunController) == false)
                 return;
             _leftHandIkTarget = miniGunController.LeftHandTarget.transform;
             _rightHandIkTarget = miniGunController.RightHandTarget.transform;
         }
-        
+
         [Rpc(SendTo.Everyone)]
         public void ResetAllIkTargetsRpc()
         {
@@ -131,17 +127,12 @@ namespace GamePlay.Playable.Characters.Animation
             CharacterAnimator.SetIKPositionWeight(AvatarIKGoal.LeftHand, 0);
             CharacterAnimator.SetIKPositionWeight(AvatarIKGoal.RightHand, 0);
         }
-
+        
         public void CallFootStepEvent()
         {
             OnFootStep?.Invoke();
         }
-
-        private void OnAnimatorMove()
-        {
-            _deltaPosition = CharacterAnimator.deltaPosition;
-        }
-
+        
         private void OnAnimatorIK(int layerIndex)
         {
             if (_leftHandIkTarget != null)

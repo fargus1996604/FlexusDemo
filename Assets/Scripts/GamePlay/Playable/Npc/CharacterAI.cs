@@ -6,6 +6,7 @@ using GamePlay.Playable.Characters.State;
 using GamePlay.Playable.Npc.State;
 using UnityEngine;
 using UnityEngine.Events;
+using UnityEngine.Serialization;
 
 namespace GamePlay.Playable.Npc
 {
@@ -15,7 +16,9 @@ namespace GamePlay.Playable.Npc
         public class InteractionData
         {
             public UnityEvent InteractPressed;
-            public Vector2 MoveDirection;
+            [FormerlySerializedAs("Axis")]
+            public Vector2 Axes;
+            public Vector3 MoveDirection;
             public bool IsSprinting;
         }
 
@@ -36,6 +39,11 @@ namespace GamePlay.Playable.Npc
         {
             if (TickableState != null)
                 TickableState.Tick(Time.deltaTime);
+        }
+
+        protected override void OnStateChangedForNetwork<T, TD>(TD data)
+        {
+            throw new NotImplementedException();
         }
     }
 }

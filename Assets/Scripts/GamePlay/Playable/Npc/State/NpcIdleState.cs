@@ -4,12 +4,13 @@ using GamePlay.Input;
 using GamePlay.Playable.Characters;
 using GamePlay.Playable.Characters.Animation;
 using GamePlay.Playable.Characters.State;
+using GamePlay.Playable.Characters.State.Server;
 using GamePlay.Vehicle.Car;
 using UnityEngine;
 
 namespace GamePlay.Playable.Npc.State
 {
-    public class NpcIdleState : TickableBaseState
+    public class NpcIdleState : BaseMovementState
     {
         private BaseCharacterController.PlayerData _data;
         private CharacterAI.InteractionData _interactionData;
@@ -19,7 +20,8 @@ namespace GamePlay.Playable.Npc.State
         public NpcIdleState(IStateContext context, BaseCharacterController.PlayerData data,
             CharacterAI.InteractionData interactionData,
             CharacterController characterController,
-            CharacterAnimationController characterAnimationController) : base(context)
+            CharacterAnimationController characterAnimationController) : base(context, data, characterController,
+            characterAnimationController)
         {
             _data = data;
             _interactionData = interactionData;
@@ -29,15 +31,13 @@ namespace GamePlay.Playable.Npc.State
 
         public override void Tick(float deltaTime)
         {
-            if (_characterController.isGrounded && _data.Velocity.y < 0)
+            var inputData = new PlayerInputData.State()
             {
-                _data.Velocity.y = -2f;
-            }
-
-            _data.Velocity.y += _data.Gravity * Time.deltaTime;
-            _characterController.Move(_characterAnimationController.DeltaPosition + (_data.Velocity * deltaTime));
-            _characterAnimationController.Move(_interactionData.MoveDirection, _characterController.transform.forward);
-            _characterAnimationController.SetDash(_interactionData.IsSprinting);
+                Axes = _interactionData.Axes,
+                MoveDirection = _interactionData.MoveDirection,
+                IsSprinting = _interactionData.IsSprinting
+            };
+            ProcessMovementState(inputData, deltaTime);
         }
 
         public override void Enter()

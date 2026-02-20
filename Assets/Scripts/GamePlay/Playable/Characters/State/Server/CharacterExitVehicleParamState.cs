@@ -1,9 +1,7 @@
 using Gameplay.Core.StateMachine;
-using Gameplay.Core.StateMachine.Interfaces;
 using GamePlay.Vehicle.Car;
-using UnityEngine;
 
-namespace GamePlay.Playable.Characters.State
+namespace GamePlay.Playable.Characters.State.Server
 {
     public class CharacterExitVehicleParamState : ParamBaseState<CarVehicle>
     {
@@ -16,8 +14,14 @@ namespace GamePlay.Playable.Characters.State
 
         public override void Enter()
         {
-            Data.ExitCar(_playerController);
-            Context.SwitchState<CharacterBaseState>();
+            if (Data.TryExitCar(_playerController))
+            {
+                Context.SwitchState<CharacterBaseState>();
+            }
+            else
+            {
+                Context.SwitchState<CharacterBaseState>();
+            }
         }
 
         public override void Exit()

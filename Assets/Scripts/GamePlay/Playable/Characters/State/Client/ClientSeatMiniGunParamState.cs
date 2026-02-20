@@ -1,28 +1,22 @@
 using Gameplay.Core.StateMachine;
 using GamePlay.Playable.Characters.Animation;
+using GamePlay.Playable.Characters.State.Server;
 using GamePlay.Vehicle.Car;
 using GamePlay.Vehicle.Car.Seats;
+using GamePlay.Vehicle.Car.Weapons;
 using UnityEngine;
 
-namespace GamePlay.Playable.Characters.State
+namespace GamePlay.Playable.Characters.State.Client
 {
-    public class
-        CharacterDrivingVehicleParamState : ParamBaseState<CharacterDrivingVehicleParamState.VehicleData>
+    public class ClientSeatMiniGunParamState : TickableParamBaseState<ServerSeatMiniGunParamState.SeatData>
     {
-        public struct VehicleData
-        {
-            public CarVehicle Vehicle;
-            public DriverSeat DriverSeat;
-        }
-        
         private BaseCharacterController _baseCharacterController;
         private CharacterController _characterController;
         private CharacterAnimationController _characterAnimationController;
         private VehicleInputData _inputData;
-
-        public CharacterDrivingVehicleParamState(BaseCharacterController context, CharacterController characterController,
-            CharacterAnimationController characterAnimationController, VehicleInputData inputData) :
-            base(context)
+        
+        public ClientSeatMiniGunParamState(BaseCharacterController context, CharacterController characterController,
+            CharacterAnimationController characterAnimationController, VehicleInputData inputData) : base(context)
         {
             _baseCharacterController = context;
             _characterController = characterController;
@@ -30,23 +24,31 @@ namespace GamePlay.Playable.Characters.State
             _inputData = inputData;
         }
 
+        public override void Tick(float deltaTime)
+        {
+            Data.MiniGunController.InputData.Fire = _inputData.FireEngaged;
+            Data.MiniGunController.InputData.LookDirection = _inputData.CameraForward;
+        }
+
         public override void Enter()
         {
             _characterController.enabled = false;
-            _characterAnimationController.SwitchToDrivingLayer();
+            _characterAnimationController.SwitchToMiniGunLayer();
             _characterAnimationController.ResetBodyOrientation();
+            _characterAnimationController.SetMiniGunIKTargetsRpc(Data.MiniGunController);
+            
             _inputData.InteractPressed.AddListener(ExitVehicle);
             _inputData.ChangeSeatPressed.AddListener(ChangeSeat);
-
-            Data.DriverSeat.SetInputData(_inputData.CarVehicleInputData);
+            
+            Data.MiniGunController.ResetGun();
         }
 
         public override void Exit()
         {
+            _characterAnimationController.ResetAllIkTargetsRpc();
             _inputData.InteractPressed.RemoveListener(ExitVehicle);
             _inputData.ChangeSeatPressed.RemoveListener(ChangeSeat);
-
-            Data.DriverSeat.SetInputData(null);
+            Data.MiniGunController.ResetGun();
         }
 
         private void ChangeSeat()

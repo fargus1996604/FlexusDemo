@@ -1,6 +1,7 @@
 using System;
 using GamePlay.Input;
 using GamePlay.Playable.Characters.State;
+using GamePlay.Playable.Characters.State.Server;
 using GamePlay.Vehicle.Car;
 using Unity.Netcode;
 using UnityEngine;
@@ -25,43 +26,46 @@ namespace GamePlay.Playable
         private UserInputSystem _userInputSystem;
         private Camera _camera;
 
+        private PlayerInputData.State _playerInputDataState;
+
         private void Start()
         {
+            if (IsOwner)
+            {
+                _userInputSystem = new UserInputSystem();
+                _userInputSystem.Player.Move.performed += delegate(InputAction.CallbackContext context)
+                {
+                    SendPlayerMoveRpc(context.ReadValue<Vector2>());
+                };
+                _userInputSystem.Player.Move.canceled += delegate { SendPlayerMoveRpc(Vector2.zero); };
+                _userInputSystem.Player.Sprint.performed += delegate { SendSprintRpc(true); };
+                _userInputSystem.Player.Sprint.canceled += delegate { SendSprintRpc(false); };
+                _userInputSystem.Player.Interact.performed += delegate { InvokeInteractionServerRpc(); };
+
+                _userInputSystem.Vehicle.Move.performed += delegate(InputAction.CallbackContext context)
+                {
+                    SendVehicleInputRpc(context.ReadValue<Vector2>());
+                };
+                _userInputSystem.Vehicle.Move.canceled += delegate { SendVehicleInputRpc(Vector2.zero); };
+                _userInputSystem.Vehicle.Interact.performed += delegate { InvokeVehicleInteractionRpc(); };
+                _userInputSystem.Vehicle.ChangeSeat.performed += delegate { InvokeVehicleChangeSeatRpc(); };
+                _userInputSystem.Vehicle.Brake.performed += delegate { SendVehicleBrakeRpc(true); };
+                _userInputSystem.Vehicle.Brake.canceled += delegate { SendVehicleBrakeRpc(false); };
+                _userInputSystem.Vehicle.Fire.performed += delegate { SendVehicleFireRpc(true); };
+                _userInputSystem.Vehicle.Fire.canceled += delegate { SendVehicleFireRpc(false); };
+                _userInputSystem.Enable();
+
+
+                Cursor.lockState = CursorLockMode.Locked;
+                Cursor.visible = false;
+                _camera = Camera.main;
+            }
+
             if (IsServer)
             {
                 Controller.OnStateBeginChange.AddListener(OnPlayerStateBeginChange);
             }
 
-            if (IsOwner == false)
-                return;
-
-            _userInputSystem = new UserInputSystem();
-            _userInputSystem.Player.Move.performed += delegate(InputAction.CallbackContext context)
-            {
-                SendPlayerMoveRpc(context.ReadValue<Vector2>());
-            };
-            _userInputSystem.Player.Move.canceled += delegate { SendPlayerMoveRpc(Vector2.zero); };
-            _userInputSystem.Player.Sprint.performed += delegate { SendSprintRpc(true); };
-            _userInputSystem.Player.Sprint.canceled += delegate { SendSprintRpc(false); };
-            _userInputSystem.Player.Interact.performed += delegate { InvokeInteractionRpc(); };
-
-            _userInputSystem.Vehicle.Move.performed += delegate(InputAction.CallbackContext context)
-            {
-                SendVehicleInputRpc(context.ReadValue<Vector2>());
-            };
-            _userInputSystem.Vehicle.Move.canceled += delegate { SendVehicleInputRpc(Vector2.zero); };
-            _userInputSystem.Vehicle.Interact.performed += delegate { InvokeVehicleInteractionRpc(); };
-            _userInputSystem.Vehicle.ChangeSeat.performed += delegate { InvokeVehicleChangeSeatRpc(); };
-            _userInputSystem.Vehicle.Brake.performed += delegate { SendVehicleBrakeRpc(true); };
-            _userInputSystem.Vehicle.Brake.canceled += delegate { SendVehicleBrakeRpc(false); };
-            _userInputSystem.Vehicle.Fire.performed += delegate { SendVehicleFireRpc(true); };
-            _userInputSystem.Vehicle.Fire.canceled += delegate { SendVehicleFireRpc(false); };
-            _userInputSystem.Enable();
-
-
-            Cursor.lockState = CursorLockMode.Locked;
-            Cursor.visible = false;
-            _camera = Camera.main;
             OnPlayerStateBeginChange(typeof(CharacterBaseState));
         }
 
@@ -88,6 +92,9 @@ namespace GamePlay.Playable
         [Rpc(SendTo.Owner)]
         private void ChangeInputStateRpc(ActionMapName action)
         {
+            if (_userInputSystem == null)
+                return;
+
             switch (action)
             {
                 case ActionMapName.Player:
@@ -105,32 +112,32 @@ namespace GamePlay.Playable
 
         #region PLAYER_INPUT
 
-        [Rpc(SendTo.Server)]
         private void SendPlayerMoveRpc(Vector2 move)
         {
-            Controller.PlayerInput.Axes = move;
-            Controller.PlayerInput.SetDirty(true);
+            _playerInputDataState.Axes = move;
+            Controller.PlayerInput.UpdateState(_playerInputDataState);
         }
 
-        [Rpc(SendTo.Server)]
         private void SendSprintRpc(bool isSprinting)
         {
-            Controller.PlayerInput.IsSprinting = isSprinting;
-            Controller.PlayerInput.SetDirty(true);
+            _playerInputDataState.IsSprinting = isSprinting;
+            Controller.PlayerInput.UpdateState(_playerInputDataState);
         }
 
-        [Rpc(SendTo.Server)]
         private void UpdateCameraForwardRpc(Vector3 forward)
         {
-            Controller.PlayerInput.MoveDirection = forward;
-            Controller.PlayerInput.SetDirty(true);
+            if(IsOwner == false)
+                return;
+            
+            _playerInputDataState.MoveDirection = forward;
+            Controller.PlayerInput.UpdateState(_playerInputDataState);
 
             Controller.VehicleInput.CameraForward = forward;
             Controller.VehicleInput.SetDirty(true);
         }
 
-        [Rpc(SendTo.Server)]
-        private void InvokeInteractionRpc()
+        [ServerRpc]
+        private void InvokeInteractionServerRpc()
         {
             Controller.PlayerInput.InteractPressed?.Invoke();
         }
@@ -177,34 +184,43 @@ namespace GamePlay.Playable
     }
 
     [System.Serializable]
-    public class PlayerInputData : NetworkVariableBase
+    public class PlayerInputData
     {
         public readonly UnityEvent InteractPressed = new UnityEvent();
 
-        public Vector2 Axes;
-        public Vector3 MoveDirection;
-        public bool IsSprinting;
-
-        public override void WriteField(FastBufferWriter writer)
+        [System.Serializable]
+        public struct State : INetworkSerializable
         {
-            writer.WriteValueSafe(Axes);
-            writer.WriteValueSafe(MoveDirection);
-            writer.WriteValueSafe(IsSprinting);
+            public int Tick;
+            public Vector2 Axes;
+            public Vector3 MoveDirection;
+            public bool IsSprinting;
+
+            public void NetworkSerialize<T>(BufferSerializer<T> serializer) where T : IReaderWriter
+            {
+                serializer.SerializeValue(ref Tick);
+                serializer.SerializeValue(ref Axes);
+                serializer.SerializeValue(ref MoveDirection);
+                serializer.SerializeValue(ref IsSprinting);
+            }
+
+            public override string ToString()
+            {
+                return $"{Tick}, {Axes}, {MoveDirection}, {IsSprinting}";
+            }
         }
 
-        public override void ReadField(FastBufferReader reader)
+        [SerializeField]
+        private State _state;
+
+        public void UpdateState(State newState)
         {
-            reader.ReadValueSafe(out Axes);
-            reader.ReadValueSafe(out MoveDirection);
-            reader.ReadValueSafe(out IsSprinting);
+            _state = newState;
         }
 
-        public override void WriteDelta(FastBufferWriter writer)
+        public State GetState()
         {
-        }
-
-        public override void ReadDelta(FastBufferReader reader, bool keepDirtyDelta)
-        {
+            return _state;
         }
     }
 

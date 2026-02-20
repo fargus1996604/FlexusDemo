@@ -214,7 +214,6 @@ GameObject:
   m_Component:
   - component: {fileID: 8836623386319129792}
   - component: {fileID: 3803506554278187832}
-  - component: {fileID: 6661097916969245170}
   m_Layer: 0
   m_Name: PasagerSeat
   m_TagString: Untagged
@@ -230,8 +229,8 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 3875435687930369841}
   serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0.285, y: 0.443, z: -0.043}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0.28499985, y: 0.44300002, z: -0.042999983}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -251,32 +250,39 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _pivot: {fileID: 8836623386319129792}
   _doorPlayerPivot: {fileID: 6304661960614946910}
+  _parentNetworkObject: {fileID: 8983809543994284408}
   _player: {fileID: 0}
---- !u!114 &6661097916969245170
-MonoBehaviour:
+--- !u!1 &4000816269220032825
+GameObject:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3875435687930369841}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  GlobalObjectIdHash: 2358205858
-  InScenePlacedSourceGlobalObjectIdHash: 2141413995
-  DeferredDespawnTick: 0
-  Ownership: 1
-  AlwaysReplicateAsRoot: 0
-  SynchronizeTransform: 1
-  ActiveSceneSynchronization: 0
-  SceneMigrationSynchronization: 0
-  SpawnWithObservers: 0
-  DontDestroyWithOwner: 0
-  AutoObjectParentSync: 1
-  SyncOwnerTransformWhenParented: 1
-  AllowOwnerToParent: 0
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 4413700541968155301}
+  m_Layer: 0
+  m_Name: MinigunSeatPivot
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &4413700541968155301
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4000816269220032825}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: 1, z: -0, w: 0}
+  m_LocalPosition: {x: 0.017000198, y: 0.40100002, z: -0.9095789}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1062299140565528563}
+  m_LocalEulerAnglesHint: {x: 0, y: 90, z: 0}
 --- !u!1 &5352465567322735503
 GameObject:
   m_ObjectHideFlags: 0
@@ -287,7 +293,6 @@ GameObject:
   m_Component:
   - component: {fileID: 3398102290312997121}
   - component: {fileID: 38007765146249272}
-  - component: {fileID: 7123023690857776941}
   m_Layer: 0
   m_Name: DriverSeat
   m_TagString: Untagged
@@ -303,8 +308,8 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 5352465567322735503}
   serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -0.285, y: 0.443, z: -0.043}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: -0.28499985, y: 0.44300002, z: -0.042999983}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -324,32 +329,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _pivot: {fileID: 3398102290312997121}
   _doorPlayerPivot: {fileID: 3263861085083833252}
+  _parentNetworkObject: {fileID: 8983809543994284408}
   _player: {fileID: 0}
---- !u!114 &7123023690857776941
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5352465567322735503}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  GlobalObjectIdHash: 2138113665
-  InScenePlacedSourceGlobalObjectIdHash: 2141413995
-  DeferredDespawnTick: 0
-  Ownership: 1
-  AlwaysReplicateAsRoot: 0
-  SynchronizeTransform: 1
-  ActiveSceneSynchronization: 0
-  SceneMigrationSynchronization: 0
-  SpawnWithObservers: 0
-  DontDestroyWithOwner: 0
-  AutoObjectParentSync: 1
-  SyncOwnerTransformWhenParented: 1
-  AllowOwnerToParent: 0
 --- !u!1 &5744811688119348084
 GameObject:
   m_ObjectHideFlags: 0
@@ -393,13 +374,14 @@ Transform:
   - {fileID: 7787474340657891283}
   - {fileID: 819402329700386121}
   - {fileID: 6461355984869777372}
-  - {fileID: 3398102290312997121}
-  - {fileID: 8836623386319129792}
   - {fileID: 3263861085083833252}
   - {fileID: 6304661960614946910}
   - {fileID: 7142781897329996902}
-  - {fileID: 2058890059187069097}
   - {fileID: 760985240323075607}
+  - {fileID: 3398102290312997121}
+  - {fileID: 8836623386319129792}
+  - {fileID: 4413700541968155301}
+  - {fileID: 2058890059187069097}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!54 &2628254007659984616
@@ -441,7 +423,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  GlobalObjectIdHash: 2141413995
+  GlobalObjectIdHash: 689692689
   InScenePlacedSourceGlobalObjectIdHash: 2141413995
   DeferredDespawnTick: 0
   Ownership: 1
@@ -950,9 +932,17 @@ PrefabInstance:
     m_TransformParent: {fileID: 1062299140565528563}
     m_Modifications:
     - target: {fileID: 612681264600559843, guid: f69250d8d526bed409c17b8bfeb6c49e, type: 3}
+      propertyPath: _pivot
+      value: 
+      objectReference: {fileID: 4413700541968155301}
+    - target: {fileID: 612681264600559843, guid: f69250d8d526bed409c17b8bfeb6c49e, type: 3}
       propertyPath: _doorPlayerPivot
       value: 
       objectReference: {fileID: 7142781897329996902}
+    - target: {fileID: 612681264600559843, guid: f69250d8d526bed409c17b8bfeb6c49e, type: 3}
+      propertyPath: _parentNetworkObject
+      value: 
+      objectReference: {fileID: 8983809543994284408}
     - target: {fileID: 1679733857649498908, guid: f69250d8d526bed409c17b8bfeb6c49e, type: 3}
       propertyPath: m_Name
       value: MachineGunSeat
@@ -975,7 +965,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1682369961269998044, guid: f69250d8d526bed409c17b8bfeb6c49e, type: 3}
       propertyPath: m_LocalRotation.x
-      value: 0
+      value: -0
       objectReference: {fileID: 0}
     - target: {fileID: 1682369961269998044, guid: f69250d8d526bed409c17b8bfeb6c49e, type: 3}
       propertyPath: m_LocalRotation.y
@@ -983,7 +973,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1682369961269998044, guid: f69250d8d526bed409c17b8bfeb6c49e, type: 3}
       propertyPath: m_LocalRotation.z
-      value: 0
+      value: -0
       objectReference: {fileID: 0}
     - target: {fileID: 1682369961269998044, guid: f69250d8d526bed409c17b8bfeb6c49e, type: 3}
       propertyPath: m_LocalEulerAnglesHint.x
