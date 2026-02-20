@@ -4,7 +4,6 @@ using GamePlay.Input;
 using GamePlay.Playable.Characters;
 using GamePlay.Playable.Characters.Animation;
 using GamePlay.Playable.Characters.State;
-using GamePlay.Playable.Characters.State.Server;
 using GamePlay.Vehicle.Car;
 using UnityEngine;
 

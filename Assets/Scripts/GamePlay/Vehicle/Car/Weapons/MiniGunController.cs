@@ -63,7 +63,6 @@ namespace GamePlay.Vehicle.Car.Weapons
             if (_activated.Value == false)
                 return;
 
-            Debug.Log(InputData.LookDirection);
             _gunMesh.transform.forward = Vector3.Lerp(_gunMesh.transform.forward, InputData.LookDirection,
                 Time.deltaTime * _lookSmooth);
             _currentRpm += (InputData.Fire ? _power : -_decreaseSpeed) * Time.deltaTime;

@@ -56,8 +56,17 @@ namespace GamePlay.Playable.Characters.Animation
             CharacterAnimator.SetBool(DASH_BOOLEAN_KEY, dash);
         }
 
+        public void ResetAllParameters()
+        {
+            CharacterAnimator.SetFloat(MOVE_X_FLOAT_KEY, 0);
+            CharacterAnimator.SetFloat(MOVE_Y_FLOAT_KEY, 0);
+            CharacterAnimator.SetBool(DASH_BOOLEAN_KEY, false);
+            CharacterAnimator.SetFloat(FORWARD_LOKOING_FLOAT_KEY, 0);
+        }
+
         public void SwitchToBaseLayer()
         {
+            ResetAllParameters();
             CharacterAnimator.SetLayerWeight(CharacterAnimator.GetLayerIndex(BASE_LAYER_NAME), 1);
             CharacterAnimator.SetLayerWeight(CharacterAnimator.GetLayerIndex(DRIVING_LAYER_NAME), 0);
             CharacterAnimator.SetLayerWeight(CharacterAnimator.GetLayerIndex(SEAT_LAYER_NAME), 0);
@@ -66,6 +75,7 @@ namespace GamePlay.Playable.Characters.Animation
 
         public void SwitchToDrivingLayer()
         {
+            ResetAllParameters();
             CharacterAnimator.SetLayerWeight(CharacterAnimator.GetLayerIndex(BASE_LAYER_NAME), 0);
             CharacterAnimator.SetLayerWeight(CharacterAnimator.GetLayerIndex(DRIVING_LAYER_NAME), 1);
             CharacterAnimator.SetLayerWeight(CharacterAnimator.GetLayerIndex(SEAT_LAYER_NAME), 0);
@@ -74,6 +84,7 @@ namespace GamePlay.Playable.Characters.Animation
 
         public void SwitchToSeatLayer()
         {
+            ResetAllParameters();
             CharacterAnimator.SetLayerWeight(CharacterAnimator.GetLayerIndex(BASE_LAYER_NAME), 0);
             CharacterAnimator.SetLayerWeight(CharacterAnimator.GetLayerIndex(DRIVING_LAYER_NAME), 0);
             CharacterAnimator.SetLayerWeight(CharacterAnimator.GetLayerIndex(SEAT_LAYER_NAME), 1);
@@ -82,6 +93,7 @@ namespace GamePlay.Playable.Characters.Animation
 
         public void SwitchToMiniGunLayer()
         {
+            ResetAllParameters();
             CharacterAnimator.SetLayerWeight(CharacterAnimator.GetLayerIndex(BASE_LAYER_NAME), 0);
             CharacterAnimator.SetLayerWeight(CharacterAnimator.GetLayerIndex(DRIVING_LAYER_NAME), 0);
             CharacterAnimator.SetLayerWeight(CharacterAnimator.GetLayerIndex(SEAT_LAYER_NAME), 0);
@@ -127,12 +139,12 @@ namespace GamePlay.Playable.Characters.Animation
             CharacterAnimator.SetIKPositionWeight(AvatarIKGoal.LeftHand, 0);
             CharacterAnimator.SetIKPositionWeight(AvatarIKGoal.RightHand, 0);
         }
-        
+
         public void CallFootStepEvent()
         {
             OnFootStep?.Invoke();
         }
-        
+
         private void OnAnimatorIK(int layerIndex)
         {
             if (_leftHandIkTarget != null)

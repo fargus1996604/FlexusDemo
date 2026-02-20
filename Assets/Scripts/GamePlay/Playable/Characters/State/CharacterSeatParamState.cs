@@ -2,25 +2,23 @@ using Gameplay.Core.StateMachine;
 using GamePlay.Playable.Characters.Animation;
 using GamePlay.Vehicle.Car;
 using GamePlay.Vehicle.Car.Seats;
-using GamePlay.Vehicle.Car.Weapons;
 using Unity.Netcode;
+using Unity.Netcode.Components;
 using UnityEngine;
 
-namespace GamePlay.Playable.Characters.State.Server
+namespace GamePlay.Playable.Characters.State
 {
-    public class ServerSeatMiniGunParamState : ParamBaseState<ServerSeatMiniGunParamState.SeatData>
+    public class CharacterSeatParamState : ParamBaseState<CharacterSeatParamState.VehicleData>
     {
-        public struct SeatData : IStateNetworkData
+        public struct VehicleData : IStateNetworkData
         {
             public CarVehicle Vehicle;
-            public MiniGunSeat MiniGunSeat;
-            public MiniGunController MiniGunController;
-            
+            public Seat Seat;
+
             public void Boxing(NetworkBehaviourReference[] references)
             {
                 references[0].TryGet(out Vehicle);
-                references[1].TryGet(out MiniGunSeat);
-                references[2].TryGet(out MiniGunController);
+                references[1].TryGet(out Seat);
             }
 
             public NetworkBehaviourReference[] Unboxing()
@@ -28,53 +26,62 @@ namespace GamePlay.Playable.Characters.State.Server
                 return new NetworkBehaviourReference[]
                 {
                     Vehicle,
-                    MiniGunSeat,
-                    MiniGunController
+                    Seat
                 };
             }
 
             public bool IsValid()
             {
-                return Vehicle != null && MiniGunSeat != null && MiniGunController != null;
+                return Vehicle != null && Seat != null;
             }
         }
 
-        private BaseCharacterController _baseCharacterController;
+        private PlayerController _playerController;
         private CharacterController _characterController;
         private CharacterAnimationController _characterAnimationController;
+        private NetworkAnimator _networkAnimator;
         private VehicleInputData _inputData;
 
-        public ServerSeatMiniGunParamState(BaseCharacterController context, CharacterController characterController,
-            CharacterAnimationController characterAnimationController, VehicleInputData inputData) : base(context)
+        public CharacterSeatParamState(PlayerController context, CharacterController characterController,
+            CharacterAnimationController characterAnimationController, NetworkAnimator networkAnimator,
+            VehicleInputData inputData) :
+            base(context)
         {
-            _baseCharacterController = context;
+            _playerController = context;
             _characterController = characterController;
             _characterAnimationController = characterAnimationController;
+            _networkAnimator = networkAnimator;
             _inputData = inputData;
         }
 
         public override void Enter()
         {
             _characterController.enabled = false;
-            _characterAnimationController.SwitchToMiniGunLayer();
-            _characterAnimationController.ResetBodyOrientation();
-            _characterAnimationController.SetMiniGunIKTargetsRpc(Data.MiniGunController);
-            _inputData.InteractPressed.AddListener(ExitVehicle);
-            _inputData.ChangeSeatPressed.AddListener(ChangeSeat);
-            Data.MiniGunController.Activate();
+            if (_playerController.IsServer)
+            {
+                _characterAnimationController.SwitchToSeatLayer();
+                _characterAnimationController.ResetBodyOrientation();
+                _inputData.InteractPressed.AddListener(ExitVehicle);
+                _inputData.ChangeSeatPressed.AddListener(ChangeSeat);
+            }
+            else
+            {
+                _playerController.transform.localPosition = Data.Seat.Pivot.localPosition;
+                _playerController.transform.localRotation = Data.Seat.Pivot.localRotation;
+                _networkAnimator.enabled = true;
+            }
         }
 
         public override void Exit()
         {
-            _characterAnimationController.ResetAllIkTargetsRpc();
             _inputData.InteractPressed.RemoveListener(ExitVehicle);
             _inputData.ChangeSeatPressed.RemoveListener(ChangeSeat);
-            Data.MiniGunController.Deactivate();
+            _networkAnimator.enabled = false;
         }
 
         private void ChangeSeat()
         {
-            var seat = Data.Vehicle.TryChangeSeat(_baseCharacterController);
+            var seat = Data.Vehicle.TryChangeSeat(_playerController);
             var data = new CharacterChangeSeatParamState.VehicleData()
             {
                 Vehicle = Data.Vehicle,

@@ -1,25 +1,50 @@
 using Gameplay.Core.StateMachine;
-using Gameplay.Core.StateMachine.Interfaces;
-using GamePlay.Playable.Characters.State.Client;
 using GamePlay.Vehicle.Car;
 using GamePlay.Vehicle.Car.Seats;
+using Unity.Netcode;
 
-namespace GamePlay.Playable.Characters.State.Server
+namespace GamePlay.Playable.Characters.State
 {
     public class CharacterChangeSeatParamState : ParamBaseState<CharacterChangeSeatParamState.VehicleData>
     {
-        public struct VehicleData
+        public struct VehicleData : IStateNetworkData
         {
             public CarVehicle Vehicle;
             public Seat Seat;
+
+            public void Boxing(NetworkBehaviourReference[] references)
+            {
+                references[0].TryGet(out Vehicle);
+                references[1].TryGet(out Seat);
+            }
+
+            public NetworkBehaviourReference[] Unboxing()
+            {
+                return new NetworkBehaviourReference[]
+                {
+                    Vehicle,
+                    Seat
+                };
+            }
+
+            public bool IsValid()
+            {
+                return Vehicle != null && Seat != null;
+            }
         }
 
-        public CharacterChangeSeatParamState(IStateContext context) : base(context)
+        private PlayerController _playerController;
+        
+        public CharacterChangeSeatParamState(PlayerController context) : base(context)
         {
+            _playerController = context;
         }
 
         public override void Enter()
         {
+            if(_playerController.IsServer == false)
+                return;
+            
             if (Data.Seat is DriverSeat driverSeat)
             {
                 var data = new CharacterDrivingVehicleParamState.VehicleData
@@ -33,15 +58,15 @@ namespace GamePlay.Playable.Characters.State.Server
             }
             else if (Data.Seat is MiniGunSeat miniGunSeat)
             {
-                var data = new ServerSeatMiniGunParamState.SeatData()
+                var data = new CharacterSeatMiniGunParamState.SeatData()
                 {
                     Vehicle = Data.Vehicle,
                     MiniGunSeat = miniGunSeat,
                     MiniGunController = miniGunSeat.Controller
                 };
                 Context
-                    .SwitchStateWithData<ServerSeatMiniGunParamState,
-                        ServerSeatMiniGunParamState.SeatData>(data);
+                    .SwitchStateWithData<CharacterSeatMiniGunParamState,
+                        CharacterSeatMiniGunParamState.SeatData>(data);
             }
             else
             {

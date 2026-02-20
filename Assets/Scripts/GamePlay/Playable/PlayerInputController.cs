@@ -1,7 +1,6 @@
 using System;
 using GamePlay.Input;
 using GamePlay.Playable.Characters.State;
-using GamePlay.Playable.Characters.State.Server;
 using GamePlay.Vehicle.Car;
 using Unity.Netcode;
 using UnityEngine;

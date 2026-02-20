@@ -4,11 +4,8 @@ using System.Linq;
 using Gameplay.Core.StateMachine;
 using GamePlay.Playable.Characters;
 using GamePlay.Playable.Characters.State;
-using GamePlay.Playable.Characters.State.Client;
-using GamePlay.Playable.Characters.State.Server;
 using TMPro;
 using Unity.Netcode;
-using Unity.Netcode.Components;
 using UnityEngine;
 
 namespace GamePlay.Playable
@@ -39,44 +36,38 @@ namespace GamePlay.Playable
                 _playerNameLabel.text = "Player" + OwnerClientId;
             }
 
-            if (IsServer || IsHost)
+            if (IsServer || IsOwner == false)
             {
-                States = new List<BaseState>()
-                {  new ServerSeatMiniGunParamState(this, CharacterController, CharacterAnimationController,
-                        VehicleInput),
-                    new CharacterBaseState(this, Data, CharacterController, CharacterAnimationController,
-                        PlayerInput.InteractPressed),
-                    new CharacterEnterVehicleParamState(this),
-                    new CharacterExitVehicleParamState(this),
-                    new CharacterDrivingVehicleParamState(this, CharacterController, CharacterAnimationController,
-                        VehicleInput),
-                    new CharacterSeatParamState(this, CharacterController, CharacterAnimationController,
-                        VehicleInput),
-                    new CharacterChangeSeatParamState(this)
-                  
-                };
-                OnStateBeginChange.AddListener(OnStateBeginChanged);
-                SwitchState<BaseMovementState>();
                 EnableNetworkTransformReplication();
-            }
-            else if (IsOwner)
-            {
-                States = new List<BaseState>()
-                {
-                    new ClientSeatMiniGunParamState(this,
-                        CharacterController, CharacterAnimationController,
-                        VehicleInput),
-                    new ClientNoMoveState(this, CharacterController, NetworkAnimator),
-                    new ClientMovementState(this, Data, CharacterController, CharacterAnimationController, PlayerInput,
-                        NetworkAnimator)
-                };
-                SwitchState<BaseMovementState>();
-                DisableNetworkTransformReplication();
+                OnStateBeginChange.AddListener(OnStateBeginChanged);
             }
             else
             {
-                EnableNetworkTransformReplication();
+                DisableNetworkTransformReplication();
             }
+
+            
+            if (IsServer == false && IsOwner == false)
+                return;
+
+            States = new List<BaseState>()
+            {
+                new CharacterBaseState(this, Data, CharacterController, CharacterAnimationController, NetworkAnimator,
+                    PlayerInput.InteractPressed),
+                new CharacterEnterVehicleParamState(this),
+                new CharacterExitVehicleParamState(this),
+                new CharacterDrivingVehicleParamState(this, CharacterController, CharacterAnimationController,
+                    NetworkAnimator,
+                    VehicleInput),
+                new CharacterSeatParamState(this, CharacterController, CharacterAnimationController, NetworkAnimator,
+                    VehicleInput),
+                new CharacterChangeSeatParamState(this),
+                new CharacterSeatMiniGunParamState(this, CharacterController, CharacterAnimationController,
+                    NetworkAnimator,
+                    VehicleInput),
+            };
+
+            SwitchState<BaseMovementState>();
         }
 
         private void Update()
@@ -107,9 +98,9 @@ namespace GamePlay.Playable
 
         private void OnStateBeginChanged(Type type, object param)
         {
-            if (type == typeof(ServerSeatMiniGunParamState))
+            if (type == typeof(CharacterSeatMiniGunParamState))
             {
-                if (param is ServerSeatMiniGunParamState.SeatData seatData)
+                if (param is CharacterSeatMiniGunParamState.SeatData seatData)
                 {
                     CallChangeCameraRpc(CameraController.State.Minigun, seatData.MiniGunController);
                 }
@@ -117,35 +108,6 @@ namespace GamePlay.Playable
             else
             {
                 CallChangeCameraRpc(CameraController.State.Default, this);
-            }
-
-            if (type == typeof(CharacterBaseState))
-            {
-                CallPlayerControlSwitchClientRpc(true, default, default);
-            }
-            else if (type == typeof(CharacterDrivingVehicleParamState))
-            {
-                if (param is CharacterDrivingVehicleParamState.VehicleData vehicleData)
-                {
-                    var seatTransform = vehicleData.DriverSeat.transform;
-                    CallPlayerControlSwitchClientRpc(false, seatTransform.localPosition, seatTransform.localRotation);
-                }
-            }
-            else if (type == typeof(CharacterSeatParamState))
-            {
-                if (param is CharacterSeatParamState.VehicleData vehicleData)
-                {
-                    var seatTransform = vehicleData.Seat.transform;
-                    CallPlayerControlSwitchClientRpc(false, seatTransform.localPosition, seatTransform.localRotation);
-                }
-            }
-            else if (type == typeof(ServerSeatMiniGunParamState))
-            {
-                if (param is ServerSeatMiniGunParamState.SeatData seatData)
-                {
-                    var seatTransform = seatData.MiniGunSeat.Pivot;
-                    CallPlayerControlSwitchClientRpc(false, seatTransform.localPosition, seatTransform.localRotation);
-                }
             }
         }
 
@@ -162,6 +124,9 @@ namespace GamePlay.Playable
         [Rpc(SendTo.Owner)]
         private void SendStateChangedRpc(int index, NetworkBehaviourReference[] data)
         {
+            if(IsServer)
+                return;
+            
             var state = States[index];
             Debug.Log($"Receive state {state.GetType()} count: {data.Length}");
             if (state is ParamBaseState)
@@ -171,29 +136,6 @@ namespace GamePlay.Playable
             }
         }
 
-        [Rpc(SendTo.Owner)]
-        private void CallPlayerControlSwitchClientRpc(bool canControl, Vector3 localPosition, Quaternion localRotation)
-        {
-            if (IsHost)
-                return;
-
-            if (canControl)
-            {
-                if (State is not BaseMovementState)
-                {
-                    SwitchState<BaseMovementState>();
-                }
-            }
-            else
-            {
-                var anchor = new ClientNoMoveState.Anchor()
-                {
-                    Position = localPosition,
-                    Rotation = localRotation
-                };
-                SwitchStateWithData<ClientNoMoveState, ClientNoMoveState.Anchor>(anchor);
-            }
-        }
 
         [Rpc(SendTo.Owner)]
         private void CallChangeCameraRpc(CameraController.State state,
@@ -210,7 +152,7 @@ namespace GamePlay.Playable
             if (IsHost)
                 return;
 
-            if (State is ClientMovementState clientMovementState)
+            if (State is CharacterBaseState clientMovementState)
             {
                 clientMovementState.Reconcile(movementState);
             }

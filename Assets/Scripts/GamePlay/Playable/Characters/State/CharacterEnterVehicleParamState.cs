@@ -1,9 +1,8 @@
 using Gameplay.Core.StateMachine;
-using GamePlay.Playable.Characters.State.Client;
 using GamePlay.Vehicle.Car;
 using GamePlay.Vehicle.Car.Seats;
 
-namespace GamePlay.Playable.Characters.State.Server
+namespace GamePlay.Playable.Characters.State
 {
     public class CharacterEnterVehicleParamState : ParamBaseState<CarVehicle>
     {
@@ -16,6 +15,9 @@ namespace GamePlay.Playable.Characters.State.Server
 
         public override void Enter()
         {
+            if (_playerController.IsServer == false)
+                return;
+            
             var freeSeat = Data.TryEnterCar(_playerController);
             if (freeSeat is DriverSeat driverSeat)
             {
@@ -30,15 +32,15 @@ namespace GamePlay.Playable.Characters.State.Server
             }
             else if (freeSeat is MiniGunSeat miniGunSeat)
             {
-                var data = new ServerSeatMiniGunParamState.SeatData()
+                var data = new CharacterSeatMiniGunParamState.SeatData()
                 {
                     Vehicle = Data,
                     MiniGunSeat = miniGunSeat,
                     MiniGunController = miniGunSeat.Controller
                 };
                 Context
-                    .SwitchStateWithData<ServerSeatMiniGunParamState,
-                        ServerSeatMiniGunParamState.SeatData>(data);
+                    .SwitchStateWithData<CharacterSeatMiniGunParamState,
+                        CharacterSeatMiniGunParamState.SeatData>(data);
             }
             else if (freeSeat != null)
             {
