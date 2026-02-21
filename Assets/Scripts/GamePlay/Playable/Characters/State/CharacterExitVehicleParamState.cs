@@ -1,9 +1,11 @@
 using Gameplay.Core.StateMachine;
+using GamePlay.Playable.Characters.State.StateParam;
 using GamePlay.Vehicle.Car;
+using UnityEngine;
 
 namespace GamePlay.Playable.Characters.State
 {
-    public class CharacterExitVehicleParamState : ParamBaseState<CarVehicle>
+    public class CharacterExitVehicleParamState : ParamBaseState<LeaveVehicleSeat>
     {
         private BaseCharacterController _playerController;
 
@@ -14,16 +16,14 @@ namespace GamePlay.Playable.Characters.State
 
         public override void Enter()
         {
-            if(_playerController.IsServer == false)
-                return;
-            
-            if (Data.TryExitCar(_playerController))
+            if (_playerController.IsServer)
             {
+                Data.Vehicle.TryExitCar(_playerController);
                 Context.SwitchState<CharacterBaseState>();
             }
             else
             {
-                Context.SwitchState<CharacterBaseState>();
+                _playerController.transform.position = Data.Seat.DoorPlayerPivot.position;
             }
         }
 

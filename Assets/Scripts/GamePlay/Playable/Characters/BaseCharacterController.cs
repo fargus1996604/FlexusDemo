@@ -81,7 +81,7 @@ namespace GamePlay.Playable.Characters
         {
             var pendingState = States.Find(state => state.GetType() == stateType);
             IStateNetworkData data = null;
-            if (pendingState is ParamBaseState paramBaseState)
+            if (references != null && pendingState is ParamBaseState paramBaseState)
             {
                 if (paramBaseState.GetData() is not IStateNetworkData paramData)
                 {
@@ -89,9 +89,9 @@ namespace GamePlay.Playable.Characters
                     return;
                 }
 
-                if (references == null || references.Length == 0)
+                if (references.Length == 0)
                 {
-                    Debug.LogError($"Data is null: {pendingState.GetType()}");
+                    Debug.LogError($"Data is empty: {pendingState.GetType()}");
                     return;
                 }
 

@@ -40,7 +40,7 @@ namespace GamePlay.Playable.Characters.State
             _characterController.Move(_characterController.transform.TransformDirection(moveDelta) +
                                       (_data.Velocity * tickDelta));
 
-            var cameraLook = input.MoveDirection;
+            var cameraLook = input.LookDirection;
             _characterAnimationController.Move(input.Axes, cameraLook, tickDelta);
             _characterAnimationController.SetDash(input.IsSprinting);
 

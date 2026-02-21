@@ -16,7 +16,6 @@ namespace GamePlay.Playable.Npc
         public class InteractionData
         {
             public UnityEvent InteractPressed;
-            [FormerlySerializedAs("Axis")]
             public Vector2 Axes;
             public Vector3 MoveDirection;
             public bool IsSprinting;

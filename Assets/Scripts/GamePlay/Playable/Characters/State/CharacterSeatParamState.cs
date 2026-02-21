@@ -1,5 +1,6 @@
 using Gameplay.Core.StateMachine;
 using GamePlay.Playable.Characters.Animation;
+using GamePlay.Playable.Characters.State.StateParam;
 using GamePlay.Vehicle.Car;
 using GamePlay.Vehicle.Car.Seats;
 using Unity.Netcode;
@@ -8,43 +9,17 @@ using UnityEngine;
 
 namespace GamePlay.Playable.Characters.State
 {
-    public class CharacterSeatParamState : ParamBaseState<CharacterSeatParamState.VehicleData>
+    public class CharacterSeatParamState : ParamBaseState<SeatData>
     {
-        public struct VehicleData : IStateNetworkData
-        {
-            public CarVehicle Vehicle;
-            public Seat Seat;
-
-            public void Boxing(NetworkBehaviourReference[] references)
-            {
-                references[0].TryGet(out Vehicle);
-                references[1].TryGet(out Seat);
-            }
-
-            public NetworkBehaviourReference[] Unboxing()
-            {
-                return new NetworkBehaviourReference[]
-                {
-                    Vehicle,
-                    Seat
-                };
-            }
-
-            public bool IsValid()
-            {
-                return Vehicle != null && Seat != null;
-            }
-        }
-
         private PlayerController _playerController;
         private CharacterController _characterController;
         private CharacterAnimationController _characterAnimationController;
         private NetworkAnimator _networkAnimator;
-        private VehicleInputData _inputData;
+        private PlayerInputData _inputData;
 
         public CharacterSeatParamState(PlayerController context, CharacterController characterController,
             CharacterAnimationController characterAnimationController, NetworkAnimator networkAnimator,
-            VehicleInputData inputData) :
+            PlayerInputData inputData) :
             base(context)
         {
             _playerController = context;
@@ -82,18 +57,23 @@ namespace GamePlay.Playable.Characters.State
         private void ChangeSeat()
         {
             var seat = Data.Vehicle.TryChangeSeat(_playerController);
-            var data = new CharacterChangeSeatParamState.VehicleData()
+            var data = new ChangeSeatData()
             {
                 Vehicle = Data.Vehicle,
                 Seat = seat
             };
 
-            Context.SwitchStateWithData<CharacterChangeSeatParamState, CharacterChangeSeatParamState.VehicleData>(data);
+            Context.SwitchStateWithData<CharacterChangeSeatParamState, ChangeSeatData>(data);
         }
 
         private void ExitVehicle()
         {
-            Context.SwitchStateWithData<CharacterExitVehicleParamState, CarVehicle>(Data.Vehicle);
+            var data = new LeaveVehicleSeat()
+            {
+                Vehicle = Data.Vehicle,
+                Seat = Data.Seat
+            };
+            Context.SwitchStateWithData<CharacterExitVehicleParamState, LeaveVehicleSeat>(data);
         }
     }
 }

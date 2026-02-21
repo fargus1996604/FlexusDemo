@@ -12,7 +12,7 @@ namespace GamePlay.Vehicle.Car
     public class CarVehicle : NetworkBehaviour
     {
         [Serializable]
-        public class InputData
+        public struct InputData
         {
             public float Throttle;
             public float Steering;
@@ -43,7 +43,7 @@ namespace GamePlay.Vehicle.Car
             if(HasAuthority == false)
                 return;
             
-            if (_driverSeat.InputData != null)
+            if (_driverSeat.HasFree == false)
             {
                 Controller.SetThrottle(_driverSeat.InputData.Throttle);
                 Controller.SetSteering(_driverSeat.InputData.Steering);

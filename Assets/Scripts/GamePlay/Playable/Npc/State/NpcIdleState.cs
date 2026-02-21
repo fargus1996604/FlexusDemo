@@ -33,7 +33,7 @@ namespace GamePlay.Playable.Npc.State
             var inputData = new PlayerInputData.State()
             {
                 Axes = _interactionData.Axes,
-                MoveDirection = _interactionData.MoveDirection,
+                LookDirection = _interactionData.MoveDirection,
                 IsSprinting = _interactionData.IsSprinting
             };
             ProcessMovementState(inputData, deltaTime);

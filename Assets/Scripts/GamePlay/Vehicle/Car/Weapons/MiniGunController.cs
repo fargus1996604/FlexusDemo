@@ -8,7 +8,7 @@ namespace GamePlay.Vehicle.Car.Weapons
     public class MiniGunController : NetworkBehaviour
     {
         public MiniGunInputData InputData = new();
-        
+
         [SerializeField]
         private NetworkObject _leftHandTarget;
 
@@ -113,9 +113,31 @@ namespace GamePlay.Vehicle.Car.Weapons
     }
 
     [System.Serializable]
-    public class MiniGunInputData 
+    public class MiniGunInputData : NetworkVariableBase
     {
         public Vector3 LookDirection;
         public bool Fire;
+
+        public override void WriteDelta(FastBufferWriter writer)
+        {
+            writer.WriteValueSafe(LookDirection);
+            writer.WriteValueSafe(Fire);
+        }
+
+        public override void WriteField(FastBufferWriter writer)
+        {
+            WriteDelta(writer);
+        }
+
+        public override void ReadField(FastBufferReader reader)
+        {
+            reader.ReadValueSafe(out LookDirection);
+            reader.ReadValueSafe(out Fire);
+        }
+
+        public override void ReadDelta(FastBufferReader reader, bool keepDirtyDelta)
+        {
+            ReadField(reader);
+        }
     }
 }

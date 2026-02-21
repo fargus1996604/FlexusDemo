@@ -4,6 +4,7 @@ using System.Linq;
 using Gameplay.Core.StateMachine;
 using GamePlay.Playable.Characters;
 using GamePlay.Playable.Characters.State;
+using GamePlay.Playable.Characters.State.StateParam;
 using TMPro;
 using Unity.Netcode;
 using UnityEngine;
@@ -12,14 +13,13 @@ namespace GamePlay.Playable
 {
     public class PlayerController : BaseCharacterController
     {
+        public PlayerInputData PlayerInput = new();
+
         [SerializeField]
         private GameObject _networkPanel;
 
         [SerializeField]
         private TextMeshPro _playerNameLabel;
-
-        public PlayerInputData PlayerInput = new();
-        public VehicleInputData VehicleInput = new();
 
         [SerializeField]
         private NetworkVariable<int> _playerNumber;
@@ -36,17 +36,21 @@ namespace GamePlay.Playable
                 _playerNameLabel.text = "Player" + OwnerClientId;
             }
 
-            if (IsServer || IsOwner == false)
+            if (IsServer)
             {
                 EnableNetworkTransformReplication();
                 OnStateBeginChange.AddListener(OnStateBeginChanged);
             }
-            else
+            else if (IsOwner)
             {
                 DisableNetworkTransformReplication();
             }
+            else
+            {
+                EnableNetworkTransformReplication();
+            }
 
-            
+
             if (IsServer == false && IsOwner == false)
                 return;
 
@@ -58,13 +62,13 @@ namespace GamePlay.Playable
                 new CharacterExitVehicleParamState(this),
                 new CharacterDrivingVehicleParamState(this, CharacterController, CharacterAnimationController,
                     NetworkAnimator,
-                    VehicleInput),
+                    PlayerInput),
                 new CharacterSeatParamState(this, CharacterController, CharacterAnimationController, NetworkAnimator,
-                    VehicleInput),
+                    PlayerInput),
                 new CharacterChangeSeatParamState(this),
                 new CharacterSeatMiniGunParamState(this, CharacterController, CharacterAnimationController,
                     NetworkAnimator,
-                    VehicleInput),
+                    PlayerInput),
             };
 
             SwitchState<BaseMovementState>();
@@ -100,7 +104,7 @@ namespace GamePlay.Playable
         {
             if (type == typeof(CharacterSeatMiniGunParamState))
             {
-                if (param is CharacterSeatMiniGunParamState.SeatData seatData)
+                if (param is MiniGunSeatData seatData)
                 {
                     CallChangeCameraRpc(CameraController.State.Minigun, seatData.MiniGunController);
                 }
@@ -119,21 +123,22 @@ namespace GamePlay.Playable
             {
                 SendStateChangedRpc(index, networkData.Unboxing());
             }
+            else
+            {
+                SendStateChangedRpc(index, default);
+            }
         }
 
         [Rpc(SendTo.Owner)]
         private void SendStateChangedRpc(int index, NetworkBehaviourReference[] data)
         {
-            if(IsServer)
+            if (IsServer)
                 return;
-            
+
             var state = States[index];
-            Debug.Log($"Receive state {state.GetType()} count: {data.Length}");
-            if (state is ParamBaseState)
-            {
-                Debug.Log("Enter");
-                SwitchStateWithReferenceData(state.GetType(), data);
-            }
+            SwitchStateWithReferenceData(state.GetType(), data);
+
+            Debug.Log("EnterNetworkState " + State.GetType());
         }
 
 
@@ -161,6 +166,7 @@ namespace GamePlay.Playable
         [ServerRpc]
         public void SendInputServerRpc(PlayerInputData.State state)
         {
+            PlayerInput.UpdateState(state);
             if (State is CharacterBaseState characterBaseState)
             {
                 characterBaseState.ServerInputStateQueue.Enqueue(state);

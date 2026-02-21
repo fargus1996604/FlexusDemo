@@ -1,11 +1,12 @@
 using System.Collections.Generic;
 using GamePlay.Playable.Characters.Animation;
 using GamePlay.Vehicle.Car;
-using Test;
 using Unity.Netcode;
 using Unity.Netcode.Components;
 using UnityEngine;
 using UnityEngine.Events;
+using Utils;
+using NetworkTimer = Utils.NetworkTimer;
 
 namespace GamePlay.Playable.Characters.State
 {

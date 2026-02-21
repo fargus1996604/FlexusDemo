@@ -14,6 +14,7 @@ namespace GamePlay.Vehicle.Car.Seats
 
         [SerializeField]
         private Transform _doorPlayerPivot;
+        public Transform DoorPlayerPivot => _doorPlayerPivot;
 
         [SerializeField]
         private NetworkObject _parentNetworkObject;

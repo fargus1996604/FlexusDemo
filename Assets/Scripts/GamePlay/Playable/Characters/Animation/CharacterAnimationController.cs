@@ -105,7 +105,7 @@ namespace GamePlay.Playable.Characters.Animation
             transform.localRotation = Quaternion.identity;
         }
 
-        [Rpc(SendTo.Owner)]
+        [Rpc(SendTo.Everyone)]
         public void SetLeftHandIKTargetRpc(NetworkObjectReference networkObjectReference)
         {
             if (networkObjectReference.TryGet(out NetworkObject networkObject) == false)
@@ -113,7 +113,7 @@ namespace GamePlay.Playable.Characters.Animation
             _leftHandIkTarget = networkObject.transform;
         }
 
-        [Rpc(SendTo.Owner)]
+        [Rpc(SendTo.Everyone)]
         public void SetRightHandIKTargetRpc(NetworkObjectReference networkObjectReference)
         {
             if (networkObjectReference.TryGet(out NetworkObject networkObject) == false)
@@ -135,9 +135,6 @@ namespace GamePlay.Playable.Characters.Animation
         {
             _leftHandIkTarget = null;
             _rightHandIkTarget = null;
-
-            CharacterAnimator.SetIKPositionWeight(AvatarIKGoal.LeftHand, 0);
-            CharacterAnimator.SetIKPositionWeight(AvatarIKGoal.RightHand, 0);
         }
 
         public void CallFootStepEvent()
@@ -152,11 +149,21 @@ namespace GamePlay.Playable.Characters.Animation
                 CharacterAnimator.SetIKPositionWeight(AvatarIKGoal.LeftHand, 1);
                 CharacterAnimator.SetIKPosition(AvatarIKGoal.LeftHand, _leftHandIkTarget.position);
             }
+            else
+            {
+                CharacterAnimator.SetIKPositionWeight(AvatarIKGoal.LeftHand, 0);
+                CharacterAnimator.SetIKPosition(AvatarIKGoal.LeftHand, Vector3.zero);
+            }
 
             if (_rightHandIkTarget != null)
             {
                 CharacterAnimator.SetIKPositionWeight(AvatarIKGoal.RightHand, 1);
                 CharacterAnimator.SetIKPosition(AvatarIKGoal.RightHand, _rightHandIkTarget.position);
+            }
+            else
+            {
+                CharacterAnimator.SetIKPositionWeight(AvatarIKGoal.RightHand, 0);
+                CharacterAnimator.SetIKPosition(AvatarIKGoal.RightHand, Vector3.zero);
             }
         }
 
