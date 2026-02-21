@@ -39,7 +39,6 @@ namespace GamePlay.Playable
             if (IsServer)
             {
                 EnableNetworkTransformReplication();
-                OnStateBeginChange.AddListener(OnStateBeginChanged);
             }
             else if (IsOwner)
             {
@@ -100,21 +99,25 @@ namespace GamePlay.Playable
             NetworkTransform.SyncRotAngleZ = false;
         }
 
-        private void OnStateBeginChanged(Type type, object param)
+        private void HandleCameraState(BaseState state)
         {
-            if (type == typeof(CharacterSeatMiniGunParamState))
+            if (state is CharacterDrivingVehicleParamState drivingVehicleParamState)
             {
-                if (param is MiniGunSeatData seatData)
-                {
-                    CallChangeCameraRpc(CameraController.State.Minigun, seatData.MiniGunController);
-                }
+                var vehicle = drivingVehicleParamState.Data.Vehicle;
+                CameraController.Instance.Activate(CameraController.State.Vehicle, vehicle.CameraLookAtPoint,
+                    vehicle.CameraLookAtPoint);
+            }
+            else if (state is CharacterSeatMiniGunParamState miniGunParamState)
+            {
+                var miniGunController = miniGunParamState.Data.MiniGunController;
+                CameraController.Instance.Activate(CameraController.State.Minigun, miniGunController.transform);
             }
             else
             {
-                CallChangeCameraRpc(CameraController.State.Default, this);
+                CameraController.Instance.Activate(default, transform);
             }
         }
-
+        
         protected override void OnStateChangedForNetwork<T, TD>(TD data)
         {
             var state = States.OfType<T>().FirstOrDefault();
@@ -127,6 +130,11 @@ namespace GamePlay.Playable
             {
                 SendStateChangedRpc(index, default);
             }
+
+            if (IsHost)
+            {
+                HandleCameraState(state);
+            }
         }
 
         [Rpc(SendTo.Owner)]
@@ -137,19 +145,9 @@ namespace GamePlay.Playable
 
             var state = States[index];
             SwitchStateWithReferenceData(state.GetType(), data);
-
-            Debug.Log("EnterNetworkState " + State.GetType());
+            HandleCameraState(state);
         }
 
-
-        [Rpc(SendTo.Owner)]
-        private void CallChangeCameraRpc(CameraController.State state,
-            NetworkBehaviourReference networkBehaviourReference)
-        {
-            if (networkBehaviourReference.TryGet(out NetworkBehaviour behaviour) == false)
-                return;
-            CameraController.Instance.Activate(state, behaviour.transform);
-        }
 
         [Rpc(SendTo.Owner)]
         public void SendMoveClientRpc(MovementState movementState)

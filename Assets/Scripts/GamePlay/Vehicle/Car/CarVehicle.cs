@@ -23,6 +23,10 @@ namespace GamePlay.Vehicle.Car
         protected CarController Controller => _controller ??= GetComponent<CarController>();
 
         [SerializeField]
+        private Transform _cameraLookAtPoint;
+        public Transform CameraLookAtPoint => _cameraLookAtPoint;
+        
+        [SerializeField]
         private DriverSeat _driverSeat;
 
         [SerializeField]
@@ -40,7 +44,7 @@ namespace GamePlay.Vehicle.Car
 
         private void Update()
         {
-            if(HasAuthority == false)
+            if (HasAuthority == false)
                 return;
             
             if (_driverSeat.HasFree == false)

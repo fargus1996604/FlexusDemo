@@ -46,10 +46,10 @@ namespace Test
         private CircularBuffer<MoveDataState> _stateBuffer;
         private UserInputSystem _inputSystem;
         private NetworkTimer _networkTimer;
-    
+
         private int _tickRate = 60;
         private float _tickDelta => 1f / _tickRate;
-    
+
 
         public override void OnNetworkSpawn()
         {
@@ -59,7 +59,7 @@ namespace Test
             _serverInputQueue = new Queue<InputData>();
             if (IsOwner)
             {
-                CameraController.Instance.ActivateDefaultCamera(transform);
+                CameraController.Instance.Activate(CameraController.State.Default, transform);
                 _inputSystem = new UserInputSystem();
                 _inputSystem.Enable();
             }
