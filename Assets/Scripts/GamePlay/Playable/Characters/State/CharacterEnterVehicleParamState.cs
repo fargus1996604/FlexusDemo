@@ -1,8 +1,8 @@
 using Gameplay.Core.StateMachine;
-using Gameplay.Core.StateMachine.Interfaces;
+using GamePlay.Playable.Characters.Extensions;
+using GamePlay.Playable.Characters.State.StateParam;
 using GamePlay.Vehicle.Car;
 using GamePlay.Vehicle.Car.Seats;
-using UnityEngine;
 
 namespace GamePlay.Playable.Characters.State
 {
@@ -17,41 +17,11 @@ namespace GamePlay.Playable.Characters.State
 
         public override void Enter()
         {
+            if (_playerController.IsServer == false)
+                return;
+
             var freeSeat = Data.TryEnterCar(_playerController);
-            if (freeSeat is DriverSeat driverSeat)
-            {
-                var data = new CharacterDrivingVehicleParamState.VehicleData
-                {
-                    Vehicle = Data,
-                    DriverSeat = driverSeat
-                };
-                Context
-                    .SwitchStateWithData<CharacterDrivingVehicleParamState,
-                        CharacterDrivingVehicleParamState.VehicleData>(data);
-            }
-            else if (freeSeat is MiniGunSeat miniGunSeat)
-            {
-                var data = new CharacterSeatMiniGunParamState.OutData()
-                {
-                    Vehicle = Data,
-                    MiniGunSeat = miniGunSeat,
-                    MiniGunController = miniGunSeat.Controller
-                };
-                Context
-                    .SwitchStateWithData<CharacterSeatMiniGunParamState,
-                        CharacterSeatMiniGunParamState.OutData>(data);
-            }
-            else
-            {
-                var data = new CharacterSeatParamState.VehicleData
-                {
-                    Vehicle = Data,
-                    Seat = freeSeat
-                };
-                Context
-                    .SwitchStateWithData<CharacterSeatParamState,
-                        CharacterSeatParamState.VehicleData>(data);
-            }
+            freeSeat.SwitchSeatState(Context, Data);
         }
 
         public override void Exit()

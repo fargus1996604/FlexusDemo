@@ -12,7 +12,7 @@ namespace GamePlay.Vehicle.Car
     public class CarVehicle : NetworkBehaviour
     {
         [Serializable]
-        public class InputData
+        public struct InputData
         {
             public float Throttle;
             public float Steering;
@@ -22,6 +22,10 @@ namespace GamePlay.Vehicle.Car
         private CarController _controller;
         protected CarController Controller => _controller ??= GetComponent<CarController>();
 
+        [SerializeField]
+        private Transform _cameraLookAtPoint;
+        public Transform CameraLookAtPoint => _cameraLookAtPoint;
+        
         [SerializeField]
         private DriverSeat _driverSeat;
 
@@ -40,10 +44,10 @@ namespace GamePlay.Vehicle.Car
 
         private void Update()
         {
-            if(HasAuthority == false)
+            if (HasAuthority == false)
                 return;
             
-            if (_driverSeat.InputData != null)
+            if (_driverSeat.HasFree == false)
             {
                 Controller.SetThrottle(_driverSeat.InputData.Throttle);
                 Controller.SetSteering(_driverSeat.InputData.Steering);
@@ -91,16 +95,17 @@ namespace GamePlay.Vehicle.Car
             return nextSeat;
         }
 
-        public void ExitCar(BaseCharacterController player)
+        public bool TryExitCar(BaseCharacterController player)
         {
             foreach (var seat in _seats)
             {
                 if (seat.Player == player)
                 {
-                    seat.Detach();
-                    return;
+                    return seat.TryDetach();;
                 }
             }
+
+            return false;
         }
 
         private Seat GetNextFreeSeat(Seat currentSeat)

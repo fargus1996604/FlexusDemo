@@ -28,6 +28,9 @@ namespace GamePlay.Vehicle.Car
 
         [SerializeField]
         private float _brakeTorque;
+
+        [SerializeField]
+        private float _maxSpeed;
         
         private float _throttleInput;
         private float _steeringInput;
@@ -36,12 +39,27 @@ namespace GamePlay.Vehicle.Car
 
         private void Update()
         {
+            ApplyResistance();
             UpdateSteeringWheels();
             AppleBrake();
             UpdateWheelsVisual();
             Engine.SetThrottle(_throttleInput);
         }
 
+        private void ApplyResistance()
+        {
+            float currentSpeed = Engine.VehicleRigidbody.linearVelocity.magnitude * 3.6f;
+
+            if (currentSpeed > _maxSpeed)
+            {
+                Engine.VehicleRigidbody.linearDamping = 5.0f; 
+            }
+            else
+            {
+                Engine.VehicleRigidbody.linearDamping = 0.05f; 
+            }
+        }
+        
         private void AppleBrake()
         {
             foreach (var wheelCollider in _brakeWheels)

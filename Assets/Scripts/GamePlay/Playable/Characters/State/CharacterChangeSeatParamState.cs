@@ -1,58 +1,24 @@
 using Gameplay.Core.StateMachine;
-using Gameplay.Core.StateMachine.Interfaces;
-using GamePlay.Vehicle.Car;
-using GamePlay.Vehicle.Car.Seats;
+using GamePlay.Playable.Characters.Extensions;
+using GamePlay.Playable.Characters.State.StateParam;
 
 namespace GamePlay.Playable.Characters.State
 {
-    public class CharacterChangeSeatParamState : ParamBaseState<CharacterChangeSeatParamState.VehicleData>
+    public class CharacterChangeSeatParamState : ParamBaseState<ChangeSeatData>
     {
-        public struct VehicleData
-        {
-            public CarVehicle Vehicle;
-            public Seat Seat;
-        }
+        private PlayerController _playerController;
 
-        public CharacterChangeSeatParamState(IStateContext context) : base(context)
+        public CharacterChangeSeatParamState(PlayerController context) : base(context)
         {
+            _playerController = context;
         }
 
         public override void Enter()
         {
-            if (Data.Seat is DriverSeat driverSeat)
-            {
-                var data = new CharacterDrivingVehicleParamState.VehicleData
-                {
-                    Vehicle = Data.Vehicle,
-                    DriverSeat = driverSeat
-                };
-                Context
-                    .SwitchStateWithData<CharacterDrivingVehicleParamState,
-                        CharacterDrivingVehicleParamState.VehicleData>(data);
-            }
-            else if (Data.Seat is MiniGunSeat miniGunSeat)
-            {
-                var data = new CharacterSeatMiniGunParamState.OutData()
-                {
-                    Vehicle = Data.Vehicle,
-                    MiniGunSeat = miniGunSeat,
-                    MiniGunController = miniGunSeat.Controller
-                };
-                Context
-                    .SwitchStateWithData<CharacterSeatMiniGunParamState,
-                        CharacterSeatMiniGunParamState.OutData>(data);
-            }
-            else
-            {
-                var data = new CharacterSeatParamState.VehicleData
-                {
-                    Vehicle = Data.Vehicle,
-                    Seat = Data.Seat
-                };
-                Context
-                    .SwitchStateWithData<CharacterSeatParamState,
-                        CharacterSeatParamState.VehicleData>(data);
-            }
+            if (_playerController.IsServer == false)
+                return;
+
+            Data.Seat.SwitchSeatState(Context, Data.Vehicle);
         }
 
         public override void Exit()

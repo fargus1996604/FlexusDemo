@@ -12,19 +12,21 @@ namespace GamePlay.Vehicle.Car
 
         public NetworkVariable<float> RPM = new NetworkVariable<float>();
         public NetworkVariable<bool> IsSliping = new NetworkVariable<bool>();
-        
+
         [SerializeField]
         private Transform _centerOfMass;
 
         [Header("Settings")]
         [SerializeField]
         private float _minRPM;
+
         public float MinRPM => _minRPM;
 
         [SerializeField]
         private float _maxRPM;
+
         public float MaxRPM => _maxRPM;
-        
+
         [SerializeField]
         private float _motorForce = 1500f;
 
@@ -50,6 +52,9 @@ namespace GamePlay.Vehicle.Car
 
         private void FixedUpdate()
         {
+            if (IsSpawned == false)
+                return;
+
             float currentMotorForce = _throttle * _motorForce;
             float avgWheelRPM = (_frontLeft.rpm + _frontRight.rpm + _rearLeft.rpm + _rearRight.rpm) / 4f;
             RPM.Value = _minRPM + Mathf.Abs(avgWheelRPM) * 4.5f;

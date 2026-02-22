@@ -58,7 +58,16 @@ PrefabInstance:
     m_AddedComponents:
     - targetCorrespondingSourceObject: {fileID: 6074253081246397337, guid: c4dff2dfa99c2754c961ba4c8cbd74de, type: 3}
       insertIndex: -1
+      addedObject: {fileID: 4517229984052137171}
+    - targetCorrespondingSourceObject: {fileID: 6074253081246397337, guid: c4dff2dfa99c2754c961ba4c8cbd74de, type: 3}
+      insertIndex: -1
       addedObject: {fileID: 8758247809571044214}
+    - targetCorrespondingSourceObject: {fileID: 6074253081246397337, guid: c4dff2dfa99c2754c961ba4c8cbd74de, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 2810449324877468089}
+    - targetCorrespondingSourceObject: {fileID: 6074253081246397337, guid: c4dff2dfa99c2754c961ba4c8cbd74de, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 7646522291951902246}
   m_SourcePrefab: {fileID: 100100000, guid: c4dff2dfa99c2754c961ba4c8cbd74de, type: 3}
 --- !u!114 &3797029994376466202 stripped
 MonoBehaviour:
@@ -76,6 +85,31 @@ GameObject:
   m_CorrespondingSourceObject: {fileID: 6074253081246397337, guid: c4dff2dfa99c2754c961ba4c8cbd74de, type: 3}
   m_PrefabInstance: {fileID: 1810252978113426770}
   m_PrefabAsset: {fileID: 0}
+--- !u!114 &4517229984052137171
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5571897771675895499}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  GlobalObjectIdHash: 3245869055
+  InScenePlacedSourceGlobalObjectIdHash: 0
+  DeferredDespawnTick: 0
+  Ownership: 1
+  AlwaysReplicateAsRoot: 0
+  SynchronizeTransform: 1
+  ActiveSceneSynchronization: 0
+  SceneMigrationSynchronization: 1
+  SpawnWithObservers: 1
+  DontDestroyWithOwner: 0
+  AutoObjectParentSync: 1
+  SyncOwnerTransformWhenParented: 1
+  AllowOwnerToParent: 0
 --- !u!114 &8758247809571044214
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -88,12 +122,91 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 774f59f4d778a5146a7e969fd991f998, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  ShowTopMostFoldoutHeaderGroup: 1
+  OnStateBeginChange:
+    m_PersistentCalls:
+      m_Calls: []
   _data:
     Gravity: -9.81
     Velocity: {x: 0, y: 0, z: 0}
     VehicleDetectionRadius: 0
+    MoveSpeed: 0
+    DashSpeed: 0
   _characterController: {fileID: 7602860826731289022}
   _characterAnimationController: {fileID: 3797029994376466202}
+  _test:
+    InteractPressed:
+      m_PersistentCalls:
+        m_Calls: []
+    Axes: {x: 0, y: 0}
+    MoveDirection: {x: 0, y: 0, z: 0}
+    IsSprinting: 0
+--- !u!114 &2810449324877468089
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5571897771675895499}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e96cb6065543e43c4a752faaa1468eb1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  ShowTopMostFoldoutHeaderGroup: 1
+  NetworkTransformExpanded: 0
+  AutoOwnerAuthorityTickOffset: 1
+  PositionInterpolationType: 0
+  RotationInterpolationType: 0
+  ScaleInterpolationType: 0
+  PositionLerpSmoothing: 1
+  PositionMaxInterpolationTime: 0.1
+  RotationLerpSmoothing: 1
+  RotationMaxInterpolationTime: 0.1
+  ScaleLerpSmoothing: 1
+  ScaleMaxInterpolationTime: 0.1
+  AuthorityMode: 0
+  TickSyncChildren: 0
+  UseUnreliableDeltas: 0
+  SyncPositionX: 1
+  SyncPositionY: 1
+  SyncPositionZ: 1
+  SyncRotAngleX: 1
+  SyncRotAngleY: 1
+  SyncRotAngleZ: 1
+  SyncScaleX: 1
+  SyncScaleY: 1
+  SyncScaleZ: 1
+  PositionThreshold: 0.001
+  RotAngleThreshold: 0.01
+  ScaleThreshold: 0.01
+  UseQuaternionSynchronization: 0
+  UseQuaternionCompression: 0
+  UseHalfFloatPrecision: 0
+  InLocalSpace: 0
+  SwitchTransformSpaceWhenParented: 0
+  Interpolate: 1
+  SlerpPosition: 0
+--- !u!114 &7646522291951902246
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5571897771675895499}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e8d0727d5ae3244e3b569694d3912374, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  ShowTopMostFoldoutHeaderGroup: 1
+  NetworkAnimatorExpanded: 0
+  AuthorityMode: 0
+  m_Animator: {fileID: 0}
+  TransitionStateInfoList: []
+  AnimatorParameterEntries:
+    ParameterEntries: []
+  AnimatorParametersExpanded: 0
 --- !u!143 &7602860826731289022 stripped
 CharacterController:
   m_CorrespondingSourceObject: {fileID: 8114790391431441644, guid: c4dff2dfa99c2754c961ba4c8cbd74de, type: 3}

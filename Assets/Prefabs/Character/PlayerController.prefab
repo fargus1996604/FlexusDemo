@@ -426,13 +426,10 @@ PrefabInstance:
       addedObject: {fileID: 8669309139906577973}
     - targetCorrespondingSourceObject: {fileID: 6074253081246397337, guid: c4dff2dfa99c2754c961ba4c8cbd74de, type: 3}
       insertIndex: -1
-      addedObject: {fileID: 8198428519834043824}
+      addedObject: {fileID: 7592427644169616921}
     - targetCorrespondingSourceObject: {fileID: 6074253081246397337, guid: c4dff2dfa99c2754c961ba4c8cbd74de, type: 3}
       insertIndex: -1
-      addedObject: {fileID: 8177541873690053390}
-    - targetCorrespondingSourceObject: {fileID: 6074253081246397337, guid: c4dff2dfa99c2754c961ba4c8cbd74de, type: 3}
-      insertIndex: -1
-      addedObject: {fileID: 4085624978292508563}
+      addedObject: {fileID: 8433047472735594683}
   m_SourcePrefab: {fileID: 100100000, guid: c4dff2dfa99c2754c961ba4c8cbd74de, type: 3}
 --- !u!4 &3575340211989226509 stripped
 Transform:
@@ -467,7 +464,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  GlobalObjectIdHash: 1984532790
+  GlobalObjectIdHash: 1035933128
   InScenePlacedSourceGlobalObjectIdHash: 1035933128
   DeferredDespawnTick: 0
   Ownership: 1
@@ -478,8 +475,8 @@ MonoBehaviour:
   SpawnWithObservers: 1
   DontDestroyWithOwner: 0
   AutoObjectParentSync: 1
-  SyncOwnerTransformWhenParented: 1
-  AllowOwnerToParent: 0
+  SyncOwnerTransformWhenParented: 0
+  AllowOwnerToParent: 1
 --- !u!114 &6067596790868544829
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -500,14 +497,18 @@ MonoBehaviour:
     Gravity: -9.81
     Velocity: {x: 0, y: 0, z: 0}
     VehicleDetectionRadius: 5
+    MoveSpeed: 1.291206
+    DashSpeed: 2.622199
   _characterController: {fileID: 7602860826731289022}
   _characterAnimationController: {fileID: 3797029994376466202}
   _networkPanel: {fileID: 378257973297593164}
   _playerNameLabel: {fileID: 7239667245285828124}
   PlayerInput:
-    Axes: {x: 0, y: 0}
-    MoveDirection: {x: 0, y: 0, z: 0}
-    IsSprinting: 0
+    _state:
+      Tick: 0
+      Axes: {x: 0, y: 0}
+      MoveDirection: {x: 0, y: 0, z: 0}
+      IsSprinting: 0
   VehicleInput:
     CarVehicleInputData:
       Throttle: 0
@@ -551,7 +552,7 @@ MonoBehaviour:
   - {fileID: 8300000, guid: bdc59dfd311802a439723dac22c94072, type: 3}
   - {fileID: 8300000, guid: 4ce1506eddbaa0e409e2a665e07c9196, type: 3}
   - {fileID: 8300000, guid: 429c791249a2cf349a635f46d6d3523a, type: 3}
---- !u!114 &8198428519834043824
+--- !u!114 &7592427644169616921
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -576,14 +577,14 @@ MonoBehaviour:
   ScaleLerpSmoothing: 1
   ScaleMaxInterpolationTime: 0.1
   AuthorityMode: 0
-  TickSyncChildren: 0
+  TickSyncChildren: 1
   UseUnreliableDeltas: 0
-  SyncPositionX: 1
-  SyncPositionY: 1
-  SyncPositionZ: 1
-  SyncRotAngleX: 1
-  SyncRotAngleY: 1
-  SyncRotAngleZ: 1
+  SyncPositionX: 0
+  SyncPositionY: 0
+  SyncPositionZ: 0
+  SyncRotAngleX: 0
+  SyncRotAngleY: 0
+  SyncRotAngleZ: 0
   SyncScaleX: 0
   SyncScaleY: 0
   SyncScaleZ: 0
@@ -594,10 +595,10 @@ MonoBehaviour:
   UseQuaternionCompression: 0
   UseHalfFloatPrecision: 0
   InLocalSpace: 0
-  SwitchTransformSpaceWhenParented: 0
-  Interpolate: 1
+  SwitchTransformSpaceWhenParented: 1
+  Interpolate: 0
   SlerpPosition: 0
---- !u!114 &8177541873690053390
+--- !u!114 &8433047472735594683
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -633,19 +634,6 @@ MonoBehaviour:
       Synchronize: 1
       ParameterType: 1
   AnimatorParametersExpanded: 0
---- !u!114 &4085624978292508563
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5571897771675895499}
-  m_Enabled: 0
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 722ad17f264e6ad46950bbf406b0551c, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  ShowTopMostFoldoutHeaderGroup: 1
 --- !u!95 &6436402467927473534 stripped
 Animator:
   m_CorrespondingSourceObject: {fileID: 4633639483886569516, guid: c4dff2dfa99c2754c961ba4c8cbd74de, type: 3}
