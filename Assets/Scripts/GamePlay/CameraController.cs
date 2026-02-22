@@ -1,7 +1,10 @@
 using System;
+using System.Collections.Generic;
 using Core.Singleton;
+using NUnit.Framework;
 using Unity.Cinemachine;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 namespace GamePlay
 {
@@ -11,44 +14,41 @@ namespace GamePlay
         public enum State
         {
             Default,
+            Vehicle,
             Minigun
         }
 
-        [SerializeField]
-        private CinemachineCamera _defaultCamera;
+        [System.Serializable]
+        public struct CameraData
+        {
+            public State State;
+            public CinemachineCamera Camera;
+        }
+
 
         [SerializeField]
-        private CinemachineCamera _miniGunCamera;
-        
-        public void Activate(State state, Transform target)
+        private List<CameraData> _cameras;
+
+        public void Activate(State state, Transform follow)
         {
-            switch (state)
+            Activate(state, follow, follow);
+        }
+
+        public void Activate(State state, Transform follow, Transform lookAt)
+        {
+            foreach (var cameraData in _cameras)
             {
-                case State.Default:
-                    ActivateDefaultCamera(target);
-                    break;
-                case State.Minigun:
-                    ActivateMiniGunCamera(target);
-                    break;
-                default:
-                    throw new ArgumentOutOfRangeException(nameof(state), state, null);
+                if (cameraData.State == state)
+                {
+                    cameraData.Camera.Follow = follow;
+                    cameraData.Camera.LookAt = lookAt;
+                    cameraData.Camera.gameObject.SetActive(true);
+                }
+                else
+                {
+                    cameraData.Camera.gameObject.SetActive(false);
+                }
             }
-        }
-
-        public void ActivateDefaultCamera(Transform target)
-        {
-            _defaultCamera.gameObject.SetActive(true);
-            _miniGunCamera.gameObject.SetActive(false);
-            _defaultCamera.Follow = target;
-            _defaultCamera.LookAt = target;
-        }
-
-        public void ActivateMiniGunCamera(Transform target)
-        {
-            _defaultCamera.gameObject.SetActive(false);
-            _miniGunCamera.gameObject.SetActive(true);
-            _miniGunCamera.Follow = target;
-            _miniGunCamera.LookAt = target;
         }
     }
 }

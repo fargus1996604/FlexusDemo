@@ -44,7 +44,7 @@ namespace GamePlay.Playable.Npc.State
 
         public override void Exit()
         {
-            Data.DriverSeat.SetInputData(null);
+            Data.DriverSeat.SetInputData(default);
         }
     }
 }

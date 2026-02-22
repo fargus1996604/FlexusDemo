@@ -1,26 +1,25 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using Gameplay.Core.StateMachine;
 using GamePlay.Playable.Characters;
 using GamePlay.Playable.Characters.State;
-using GamePlay.Vehicle.Car.Weapons;
+using GamePlay.Playable.Characters.State.StateParam;
 using TMPro;
 using Unity.Netcode;
 using UnityEngine;
 
 namespace GamePlay.Playable
 {
-    [RequireComponent(typeof(NetworkObject))]
     public class PlayerController : BaseCharacterController
     {
+        public PlayerInputData PlayerInput = new();
+
         [SerializeField]
         private GameObject _networkPanel;
 
         [SerializeField]
         private TextMeshPro _playerNameLabel;
-
-        public PlayerInputData PlayerInput = new();
-        public VehicleInputData VehicleInput = new();
 
         [SerializeField]
         private NetworkVariable<int> _playerNumber;
@@ -37,28 +36,41 @@ namespace GamePlay.Playable
                 _playerNameLabel.text = "Player" + OwnerClientId;
             }
 
-            if (IsServer == false)
-                return;
+            if (IsServer)
+            {
+                EnableNetworkTransformReplication();
+            }
+            else if (IsOwner)
+            {
+                DisableNetworkTransformReplication();
+            }
+            else
+            {
+                EnableNetworkTransformReplication();
+            }
 
+
+            if (IsServer == false && IsOwner == false)
+                return;
 
             States = new List<BaseState>()
             {
-                new CharacterBaseState(this, Data, CharacterController, CharacterAnimationController,
-                    PlayerInput),
+                new CharacterBaseState(this, Data, CharacterController, CharacterAnimationController, NetworkAnimator,
+                    PlayerInput.InteractPressed),
                 new CharacterEnterVehicleParamState(this),
                 new CharacterExitVehicleParamState(this),
                 new CharacterDrivingVehicleParamState(this, CharacterController, CharacterAnimationController,
-                    VehicleInput),
-                new CharacterSeatParamState(this, CharacterController, CharacterAnimationController,
-                    VehicleInput),
+                    NetworkAnimator,
+                    PlayerInput),
+                new CharacterSeatParamState(this, CharacterController, CharacterAnimationController, NetworkAnimator,
+                    PlayerInput),
                 new CharacterChangeSeatParamState(this),
-                new CharacterSeatMiniGunParamState(this,
-                    CharacterController, CharacterAnimationController,
-                    VehicleInput),
+                new CharacterSeatMiniGunParamState(this, CharacterController, CharacterAnimationController,
+                    NetworkAnimator,
+                    PlayerInput),
             };
 
-            OnStateBeginChange.AddListener(OnStateBeginChanged);
-            SwitchState<CharacterBaseState>();
+            SwitchState<BaseMovementState>();
         }
 
         private void Update()
@@ -67,28 +79,103 @@ namespace GamePlay.Playable
                 TickableState.Tick(Time.deltaTime);
         }
 
-        private void OnStateBeginChanged(Type type, object param)
+        private void EnableNetworkTransformReplication()
         {
-            if (type == typeof(CharacterSeatMiniGunParamState))
+            NetworkTransform.SyncPositionX = true;
+            NetworkTransform.SyncPositionY = true;
+            NetworkTransform.SyncPositionZ = true;
+            NetworkTransform.SyncRotAngleX = true;
+            NetworkTransform.SyncRotAngleY = true;
+            NetworkTransform.SyncRotAngleZ = true;
+        }
+
+        private void DisableNetworkTransformReplication()
+        {
+            NetworkTransform.SyncPositionX = false;
+            NetworkTransform.SyncPositionY = false;
+            NetworkTransform.SyncPositionZ = false;
+            NetworkTransform.SyncRotAngleX = false;
+            NetworkTransform.SyncRotAngleY = false;
+            NetworkTransform.SyncRotAngleZ = false;
+        }
+
+        private void HandleCameraState(BaseState state)
+        {
+            if (state is CharacterDrivingVehicleParamState drivingVehicleParamState)
             {
-                if (param is CharacterSeatMiniGunParamState.OutData outData)
-                {
-                    CallChangeCameraRpc(CameraController.State.Minigun, outData.MiniGunController);
-                }
+                var vehicle = drivingVehicleParamState.Data.Vehicle;
+                CameraController.Instance.Activate(CameraController.State.Vehicle, vehicle.CameraLookAtPoint,
+                    vehicle.CameraLookAtPoint);
+            }
+            else if (state is CharacterSeatMiniGunParamState miniGunParamState)
+            {
+                var miniGunController = miniGunParamState.Data.MiniGunController;
+                CameraController.Instance.Activate(CameraController.State.Minigun, miniGunController.transform);
             }
             else
             {
-                CallChangeCameraRpc(CameraController.State.Default, this);
+                CameraController.Instance.Activate(default, transform);
+            }
+        }
+        
+        protected override void OnStateChangedForNetwork<T, TD>(TD data)
+        {
+            var state = States.OfType<T>().FirstOrDefault();
+            int index = States.IndexOf(state);
+            if (data is IStateNetworkData networkData)
+            {
+                SendStateChangedRpc(index, networkData.Unboxing());
+            }
+            else
+            {
+                SendStateChangedRpc(index, default);
+            }
+
+            if (IsHost)
+            {
+                HandleCameraState(state);
             }
         }
 
         [Rpc(SendTo.Owner)]
-        private void CallChangeCameraRpc(CameraController.State state,
-            NetworkBehaviourReference networkBehaviourReference)
+        private void SendStateChangedRpc(int index, NetworkBehaviourReference[] data)
         {
-            if (networkBehaviourReference.TryGet(out NetworkBehaviour behaviour) == false)
+            if (IsServer)
                 return;
-            CameraController.Instance.Activate(state, behaviour.transform);
+
+            var state = States[index];
+            SwitchStateWithReferenceData(state.GetType(), data);
+            HandleCameraState(state);
         }
+
+
+        [Rpc(SendTo.Owner)]
+        public void SendMoveClientRpc(MovementState movementState)
+        {
+            if (IsHost)
+                return;
+
+            if (State is CharacterBaseState clientMovementState)
+            {
+                clientMovementState.Reconcile(movementState);
+            }
+        }
+
+        [ServerRpc]
+        public void SendInputServerRpc(PlayerInputData.State state)
+        {
+            PlayerInput.UpdateState(state);
+            if (State is CharacterBaseState characterBaseState)
+            {
+                characterBaseState.ServerInputStateQueue.Enqueue(state);
+            }
+        }
+    }
+
+    public interface IStateNetworkData
+    {
+        public void Boxing(NetworkBehaviourReference[] references);
+        public NetworkBehaviourReference[] Unboxing();
+        public bool IsValid();
     }
 }
